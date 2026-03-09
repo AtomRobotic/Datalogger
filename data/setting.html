@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình Datalogger - ABC Solutions</title>
+    <style>
+        :root {
+            --primary-color: #0033A0;
+            --secondary-color: #0055D4;
+            --background-color: #f4f7f9;
+            --card-background-color: #ffffff;
+            --text-color: #333333;
+            --header-text-color: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --gray-color: #6c757d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: var(--card-background-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header img {
+            height: 50px;
+            width: auto;
+            border-radius: 4px;
+        }
+
+        .header-title h1 {
+            color: var(--header-text-color);
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .header-title p {
+            color: var(--header-text-color);
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 10px;
+        }
+        
+        h3 {
+            font-size: 1em;
+            color: var(--gray-color);
+            text-align: center;
+            margin-top: 20px;
+            font-weight: normal;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .form-group.inline-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input_text {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input_text:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .button {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, opacity 0.3s;
+            text-transform: uppercase;
+        }
+        
+        .button-green { background-color: var(--success-color); color: white; }
+        .button-green:hover { background-color: #218838; }
+        .button-blue { background-color: var(--secondary-color); color: white; }
+        .button-blue:hover { background-color: var(--primary-color); }
+        .button-gray { background-color: var(--gray-color); color: white; }
+        .button-gray:hover { background-color: #5a6268; }
+
+        .wifi-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .wifi-list-table th, .wifi-list-table td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .wifi-list-table th { background-color: #f8f9fa; }
+        
+        .status-message {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 10px; right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover, .close-button:focus { color: black; }
+
+        .hidden { display: none; }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #888;
+            background-color: var(--background-color);
+        }
+        
+        .device-info {
+            font-size: 0.8em;
+            color: var(--gray-color);
+            text-align: center;
+            padding-bottom: 15px;
+        }
+        .device-info span {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .current-ssid-info {
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAYAAACKAxD9AAAACXBIWXMAAC4jAAAuIwF4pT92AAAKLWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDYwLCAyMDIwLzA1LzEyLTE2OjA0OjE3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIiB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjAzZGRhZGZiLTk3OGQtYjg0My05MjYwLWRiYTQ3NTM1ODJjZCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDoyMjdiMWUzMi1iODlmLWY1NDgtODc5NC1mMjMzYmJiNTY4YzUiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0iRDZBNjIxRTg2RjAwOUJBMjY0NDhCRDk5QUNEMTlEMjYiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiIHhtcDpDcmVhdGVEYXRlPSIyMDIyLTAzLTAzVDEwOjE3OjM0KzA3OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMy0wNC0wM1QxNDoyOTo1NSswNzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMy0wNC0wM1QxNDoyOTo1NSswNzowMCIgdGlmZjpJbWFnZVdpZHRoPSIxOTEzIiB0aWZmOkltYWdlTGVuZ3RoPSIxNjY2IiB0aWZmOlBob3RvbWV0cmljSW50ZXJwcmV0YXRpb249IjIiIHRpZmY6U2FtcGxlc1BlclBpeGVsPSIzIiB0aWZmOlhSZXNvbHV0aW9uPSIxMTgvMSIgdGlmZjpZUmVzb2x1dGlvbj0iMTE4LzEiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjMiIGV4aWY6RXhpZlZlcnNpb249IjAyMzEiIGV4aWY6Q29sb3JTcGFjZT0iNjU1MzUiIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSIxOTEzIiBleGlmOlBpeGVsWURpbWVuc2lvbj0iMTY2NiI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmRmZWVjZDJiLWMzNDUtMWI0ZC04MDZiLTU0Njk0YTM5MTVjNyIgc3RFdnQ6d2hlbj0iMjAyMi0wNS0wOVQxNDoxODoxNiswNzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjIgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjb252ZXJ0ZWQiIHN0RXZ0OnBhcmFtZXRlcnM9ImZyb20gaW1hZ2UvanBlZyB0byBpbWFnZS9wbmciLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImRlcml2ZWQiIHN0RXZ0OnBhcmFtZXRlcnM9ImNvbnZlcnRlZCBmcm9tIGltYWdlL2pwZWcgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDowZmEwY2U2NS1mYWQzLTc1NDgtOTEwYS1iNzAzZjYwNTdlY2EiIHN0RXZ0OndoZW49IjIwMjItMDUtMDlUMTQ6MTg6MTYrMDc6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4yIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MjI3YjFlMzItYjg5Zi1mNTQ4LTg3OTQtZjIzM2JiYjU2OGM1IiBzdEV2dDp3aGVuPSIyMDIzLTA0LTAzVDE0OjI5OjU1KzA3OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOmRmZWVjZDJiLWMzNDUtMWI0ZC04MDZiLTU0Njk0YTM5MTVjNyIgc3RSZWY6ZG9jdW1lbnRJRD0iRDZBNjIxRTg2RjAwOUJBMjY0NDhCRDk5QUNEMTlEMjYiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0iRDZBNjIxRTg2RjAwOUJBMjY0NDhCRDk5QUNEMTlEMjYiLz4gPHRpZmY6Qml0c1BlclNhbXBsZT4gPHJkZjpTZXE+IDxyZGY6bGk+ODwvcmRmOmxpPiA8cmRmOmxpPjg8L3JkZjpsaT4gPHJkZjpsaT44PC9yZGY6bGk+IDwvcmRmOlNlcT4gPC90aWZmOkJpdHNQZXJTYW1wbGU+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+E0uhAQAAI1FJREFUeJztnXd8lFXWx3/3Ps8zNb0XEhJCSehSQi9SVLDDLipr3bW8a3ltqyAqWGjurq6uvu5aF1BXUREE6b1JhwSSkEoKCellJtOfct8/JpGSBEIyDc3384kfP8PknpOZ85x77jn3nksYY+iiC+ptBbrwDboMoQsAXYbQRRNdhtAFgC5D6KKJLkPoAkCXIXTRRJchdAEA4EOXFHhbB1+g+/PjQ3vfO0C71duKeAtelr2tgk9Afsw0LLx3gPYIgAZvK+MNeA1PvK2DL2A9WekY+t5Bw3ODwlXzva2MN+iKEZrQ8sSy8qTxWQAJ3tbFG/DeVsBX4CjEOqsSsibH8tqtffQPJoVrva2SR+nyCBegFSh2F5nvBTDW27p4mi5DuABKALvEuM9OGBcD4LytjyfpmhouQStQpJ2zjvvptOGe6xN1X3pbH0/R5RFagaME67LNrwMI8rYunqLLI7SCiiMoqnf0+DHH/PzwWO2r3tbHE3R5hDbQChRrTzc+DaCPt3XxBF0eoQ04Chhssv/KU4Y3Z/QLmjU0Vu1tldxKl0e4DFqe4mCJ9XcAbvC2Lu6myxAuAyGAApDlx+uWAPhVuwT+HwMUb+vQbo6cKkd+UQMOJ/TzmEwtT5BWbhuyJtP4yIgY4QOPCfYw16RH0G/ZhYmVObjVXOgReWqO4r/phpcBRHhEoBe45oPF/qfTEBakwa7oZLfJEDigvFGKWpNrfWVEJP+/bhPkRa5Jj9AaEfsOYGRxFm6od89GG72KYn1246MABrpFgJe55j1Ca4wuzYZAgd0xrvMSlAAmB1P/kGNdMr6H7uZeoRqXje0L/Go8Qmt0P3oEwwszXDaeViA4VGqdDuBWlw3qI/yqDaGZsL37MbEiGzfVZXdqHAJAAfDtycbFAH5VLuFXOTVcjt5pxxAVpceeqI5NG2qOoKDO3v9ome3xKYmqd1ysntf4TXiE1uh25CiGFmRCZoB8lZ0BBI7g+1MNcwHEuEU5L/Cb8wiXckttLk4kJJPiRgV8Ox8LnhJUmKTwZemmBTP66B5zr4ae4TfrEZoYCmBejI5wMsNVpVi1AsXWPNNDAEa4RzXP8lv1COEAnt+6p/DpYQMjckP600+vdgBKAKvIhPcPNSy6uZf/lMl9/Nygpuf4rXkEHsAjOw6UHj6WUTFHlBSNoOIMIOhQ/yCNQHDknG0ygFmuVdPz/JYM4cadh8p37T1R/nGd0ZHAC5yzvNiJFlIEgEAJVpw0LATg7ypFvcFvYWpIATB/9bbCux2iAl64eHMyYx31B05UHEF+ndjrq+N1z06I177ROVW9x6/ZI4QAWLjjYOnBzPz6uyUG8EIrfy5hSqfcApyl6m8yTM8BSOzUQF7k1+gRCID7tx8sfbnWYOtFOdrCC1z0Tsaos8UgQUcNgqdAvVUOXH6q8fXpvfX3J1+Dp6R+bR5h7K5DpVt/3H5mWW2jvRcvcKD0Mod8GQAQZ6zQSa+gFyi2F1j+AGB8pwbyEr8WQ+gO4KNN+0p2na0wTSaUgOfa8ac5bYR10gacQxFAVkBXpDUuxTXoaa85hS9BD+DJDXtLnms0OyI4noJvb3oQcDoBQgghrmkNoBUIjpRaR23Iabx/SKz2c5cM6iGuZY/w+592FB7YfrB0qckmRfACh458oQQgIHBZkwg1R/BthnEBnMHqNcO16BGGAnj9+035N8sMbQeC7cWFRgA4C1JlRil+Y57lRY6yua4c251cax7h3i27i/afKTPfDHqV00AbMMYUuLgzuVag2JRjfBxAvCvHdSfXkkcI+3pt7lt2hak77QUugBDAtT4B4AhgkaD/7mi13197mNAjpZtrBbgB3uQQva1Du9i0s3BeRUVjDK8TXDcoAZjCGFM6l0doFY6TwhtrBEATAaDKdQO7h2tlaui/aVfRn6nGxQ7MuWpoCjJde2+FwBNWUmYj736ZPQdAgEsHdwN8dIhvZ8FO5tRgy77SJRaTQ+NSb9AMA4XLJwcngkqwZGVWj123reCJYQMil7hDhqu4FjzCbbsPFN/Cad1gBABACIOL8ggthgYAgbN/vSbnRQBRbhHiInw9WNQsX5W1CCDu+q4A55zgtvuMOIHaqypNQet3FL2cOjjyKXfJ6Sy8WfTd1qv7D5U8nptX198tU0ITxNk0y61dR6lWwJot+Y+kDo78DECaO2V1FF/2CDFfr81/iajc29yMAbKr8wiXQimBzSKqV23MWzL7jr7TUnr63llaSmQCX/xZsz53fk2VKYxzQdLosjDmmqrTFeC0AvYfKrsJwAy3C+sAvhosDlu9ueCP1F0B4oUQEBdnmdsQA4ASvP/58YUAdG4XeJXwlFd5W4eLyC+pxbrNeYvtdkngPWEIDMRTN1/yah7Z2TUpa9bnPDFmeOLfPCS2XfiiR5j58+HSqW5bLjbBAEBSQBhjndvCenUQDY+v12XNARDrKZntwdeCRd3HX6QtBE/d6qwlWQFlDPEx+jUTR8e9dFLFM8YcHnkoOJ6iusoc+u2GzPkTxkQ9NqSfb9QheArfWT7uOVT6VOGZ2mTezz19q2SFgYkyooI0aalDY1+hKXH5hXHh4w0NynrqQa9AdQJ+2pb70IQxUZ8BOOwpuZfDl6aG7l+szpxDNK6fEhgDJIcEP4FUTR6d8L9TZ4+Ybk7tn3SYBR7cV2J7uLxRsrp7cXIhlBLY7ZKw4tvspXBzDqO98P4B3reFohIDftpa9FpdjTmY17sueGUAZFGBikLqnxz+f/1HJbxtT+w++EiDsvlclX0AB0ARYLAzgHr4Y+C0Ao6mnbv+yLGz9/TrHfBfz0pvia/ECOM27i68z5XLRUlmILKMnnEB61MnJb9qj4tWMu3ch8XFtluYokBFnedaKLzjFgkAcBTvLTv+xseLJ64HYPCCGr/gC4bAfbA8fakoKhzvgjKzojAokowQf1XG8NE953Uf1edkukP1bGG1/QmbXeRVHHGeYIVzytDylBBGiEX65WWPwas4FBU2JH27qej5sUMivHqXFK8RvGsL2/aW3H8yo3o018l6AmOALMrQqUj9iFFxi3qMTf7qrD5o5sZqx6cGsyVCoAQqruU3rQAgDMxbEzXR8vh2bc4zY4dEfAEgz0tqeN0jhPznu8zXIHRuuShJCngwDOgV/OngCb2X0KTYnnuqlJ+qis1DKdCqAQBO9ywpjJGmDSoeXDj8AsdRGBus/ivXn3nztqlJdw9MCfe4DgDAl1VYvSIYADbvPvPC2bPGeF7fMW8gyQogK+gWpts1eGTiyyFDkxoybPySwnz7LKYoEK7g6xUG+KkopYyQRruE9pyJcQdUJ2DLrsJZt01N+gTAdq/o4A2hTSSv2pj3FOlAXKAwBskuIUIvFF4/Kv4PN/9x7L2Ng5Jv3FjODhdU2mZRMPDtmPApAYx2WTHYFcZ5OkC4SA8CWVHIv1akLQbggbx6S/hgP73HhaZnV2LT3oI3G412/dXsNWheDmooa7xuUNTbwyclf1oWHHr9xhppn6HalsAT57mCqxmPo4RQ5owx3Lj55YpwGgEnM6tS123Lf2jK+MSPPS3fWzHC1L2HSn/HadsvXpIUUKagd4z+q77DExaGDUsO396Ar0uLbeMoY1ecBlqDAVBzhFBGiRGSVzM7zm1tFMu/y5o/ZXziDwBqPCnfG4agWv7DqcWSrIDnryxeVhiYpCA2WHO47+DoOQGDepSVaYPm7S22PyiJstMDdPBRZoxBL1BCGUEl8/zy8VJ4gUP5OWPsZ1+lvzguNf5Fj8o2iWZPysPOfeV/zMqpHnal6qLCGBRRgb+Glo1IjX0tYWTy+mJ94AP7a6S5VoMlkCfkqqaB1iCEwOJQGGHE60bQDNEIWLut4IlxqfHLAGR5Sq6nPULEms3Zr16uuuiMA2SoKBEH9Al5L2lY9/esCXGpO810Z02prQ9H0KFpoDUoAYwORSGMMOql5eOlcByB2eTQfbM2a+GkcQkz7pnZ3yNyeavJcze4bNhdOK+s1BDTVnXRGQcw9Ir1/3H42J4L5MQo1WlR83lJhWMqUUSXGcCFENJ8DtZ3brLhNDx+Plp256RxCdMBbPCETE96hME/bs77H6prWVRyxgEyokJ16cNTu88NHRifXaTyfzGj0v6YKNqpQOG2CZyx5v/4hkcAnFOWJDOs2pCz9J6Z/XcAsLlbJp+SHOxuGdj981ms21awxGJ2qC9cLjanhf21fNWQ1Ng3+1+f/P1p4j/rWJ30hcliCRMoQWv9r1wFY4CGdwaLDrvs1eXjpXAaHqdOVQ746NNjf548JvYf7pbnqYTSnbt/Lr2puZ7A4JwGIMnydSlhH8x4aNSI8GmpRTssuq1HS63v2WxSmIpz66EWAM7MYrCG0mANJVfbmNvdEABEzWPF6oyXAES7W54npgbdZ99kLGK0KbcvKyCygu5R+k2pY3u+TPp0l4/ZhfdKC623gbE26wLugDEGZ5BIOtVrEcD57SWuPFDNU9TUWMI/XnnqlZm3pDzhupFbwufm1btzfBxKL308K7s6hepUkBwywgNU2aNGxLwcOqz3kXzq/3ROtf1Ju8Oqbnc+gOcgg1zSJZOAMgbIrW+7YzznrDJe+g8UMCpE9KfEABXPGIFzXFlpihsuAyEAx0GUFYgOCbLoDDYpTyGoeKgEHgqIzBjrVKKKanhs2ln08MxbUj4DcLwTQ10Wd3uEmK9W580DpVAzuX7QoPClA6/v/2VZcOgt26sdhxpMlmiBXkU+gKMQz1ZBY7aANRsNASAz2AP8IMSEtTAGRghQVAGV3YYWXwkDdH5czyGh3LySElFrA4VDEIDgAPgF60BlqfUnXOBhMlhBymsRBxu6B3AI1/EgBKg1SjhrlFFEtSRQsfnJKl4W0fH9aJQS2M2iasXKk0vHDY2+4bq+7tn8zBeeNbplYAA4kl7+Vs05Q3Bycsh/Bo5OWiT27J6wx8KtPldkSeXQdnm4VQhBY4MVd+nNWPDEgIsWe4QxvPDpSWxs9IOfXnX+aaYEpgYL7g2y4eUHBkBu5SmXGZIkhteflRQ0mh0oKG3ElhNVWJ3JQPrEQ0Vw/kQcAWTKwZxThun+Njz6u3iMGhKNoFAdQJrDLQWmeiuOZ1Wr1u1wrPpXGtHbbDJ4DdfhaYPTC9i2r2TquKHRdwJY3bFRLo87PcKkU+llSTPvGjiR7xNXmc/5v1lU4bhHksSOxQEcBamuw/2zE9CjV8ua/b0T4/DTulqgZzQgnfcKisIQHKZDYs+wdokZkQrMntEXd23MxgMrCyH1TwLX5GVkykHKLMI/JwbhsftGtbHRkcIvWI/xY/QYPyYhafzIODz0wlbUWsUON/5qPiW1fE3Oouv6xm4B4PJ0MJ8yyfUXZ+aUmmBIO1MxZtbwe8tDwu7PqJH/YrZa9QLX8bSwXVLQk9oxakjrt+dcnxqL+DWlqJFZizqurFz9ozhtWjKeLTRiQV4dAmOCAY7AknMOH0wNxsOzB7d7nFun9sTnfwVmPL4eCt/xdAiv4nDmTF3Khv3FT45OjXurY6O0jbuWj3xGcHTqXhqy7VCpfYHdLulVXCdOGFICa50JN/X2g86/9cvVgsP8MClBDYvB0q6g02qTcDK7BulZVSgoqIUktQw0b5sQD31jIxhHYay34o5QR+tGIMvIyKjA8RNlsJrsLce5oSfuuDEJiqVz/aqImsf3G7JfhLPTrEtxx9Tgt6bAtiaj0jFZRQlULjA1Rjmo6w2YMTPhsu+bOSoGK1aeA0L0F00PrXEorQKfrMz8MLp3RMnJYtPQlEDab+kzqX21FxTDggLU0BMFZspBXVGD5x7t2WKc6ioTHlx6EPuMPBjlkIQMLP/fQRjY/+IGKQ/MSMGqjflozmF2BI6nqKmzhPzt3wf+AsClTTf4apNrTzplVtqfTTtnm+yvdp2zsdkl9FeLGDbw/IerKAyZ+bUY0Pv83D9uWDR6fV+IYknBlc5KKaLEjKEhJEMVcUtOYGDKmdw888tGKy40hOo6KxoZhSzJ6K8RMXRgy+43iz5PxwYlBCH9QkEYQ1qtBa+tyMIPf734veOGxyIkVIs6k6N9faLbgFdxOHW6yuc9Qo9VmYbntYILk0Icha3KgFv7B0HQnK9TGBrtWPTOz/j83enQNW130/lrcVMvP7xbboY67PI7ryIi9MRWk//nCIsN8YqMO26ND42IuPgSlmUbz8ASEgwYbegXqQGnvjj6MBut2FpkQ0CPGNCmNoUhIVocyufw+OJ9LCZQVV7fYAux2iWNKClQGJoSWJ2DFziX90Tkr4t2zYWmFRYJy4/Wv1lnkQP1rpgPmmCEwt9gwO1jLg5qswvqsS7LiIKiBgxIPu8V7hwdgw8/LQQi/CFLCsRWM0lA/z7h2PruFKAVZ80Yw1v/PMjKjeITt46OxsaDFa/FRKhatDmpqbWiXuHAcQAk52ucLMPaPRafWEVHck7V9NzN6f9wWMTrwVFQvery1wZ4EVcGi5O35Zvv0bq4SmS1ihgaoKDfJdu8dx4rhyU2BruPnrvo9eEDo9BXI8FglaETaPHv+uieidTS0rYltP7FTBqfQIKJch8aGg/e3ks9JVzHt1iy2ewS5EvabDAGcJQgKDyAldtplcyYnQvUgPNT+czml9Zw1dTAv7WzerGoMNLZXUMXwVHYz9Xh9qEhINz5NbgiSth82gD0icOWzHN4kim/JHQEjYDpyQGQG+3vzUiNXVRxzjDaYGQtSqyGRjvSMyqbLnUCusf4Iz7B2VCdEILU66LRPUo/asL8Q0dUvbutGuyvOOC8FuAXdFoePFMgXpTtJpDtIkxF1dxtkdy0Pf6ayOoaM8BTcBrBpyqcF8JXGDtf6j5eLj54rMyW6ufCABEAFEIRYjbiljEDL3q9pNSI0uJ6REZwKKitR1W1GRfO77ePjsGZ9SW1Byvs/9x0zHD3k+Et8whpGZWYsjQdQmwYiKJAa2zEpw/2wh03JP3ynsjoANyS7Me9XWCelR3jaDFGRLgekZyMPJmh2UwVnoMqrxgrbggTgsL9P/vT5BhnsU1S8NSbu1FcbgLnztp6B3GFRwj9Kq1hvpp3valbTHZMDaVI7BF60etRMYHY/c8poIoMxnEICr64JdHg/pEoXJbzxiHFCELaSOIoDCQ2DHxKPIjCUFtYg11plRcZAgAkReuBEhFZ1XZINgf4CwJWtU6NuwYFYu6xCvApsSAA6qtNuDWA4e7fX2y8jWYHLFbRe2frrgBfZ5Y6NcDPpdYXzxrlOD+Va/9CwnEQq+twx/iwFgkijZpDt9i22xtTnsOdA4NwMNMEqmn9mL1WJyChvgbcaTuIomCEWsHDtw1q8T6LXQZV88gyCjicVoHRIy/uvP/0A4NQXncYqzLzIROKyRoR7zwztMU4ew+Xoqrags6e8XQXnfUIyauzLE+4dLnYhAQg0t6Im0b36tDv3zomFksOnkaDrvWzhEMHRePYv6c4S84E8A/SXlA4Os/RAiMEXSQknQrvrCnA6JFxuDDA1GhVeHfeWMwrN8BmlRAfHwTwLWsKn6zMBJiPdMVoBb5bRMc6vaWftWJ3oWmRyaHoXblcBAAQAkujDTdE8YjpFnTRPxWdNWDT9gKzVq+yGB1KqKQwCknB7Ft6IzL8fCzXu1cYUoMYNlpEoJXdeBwl8A+8fEPy9BOl2FomQd9PDUqAtRUqfLDsBJ58cEiL90ZEB7Y5zrc/5eDHrWfA6bx95rhtOvMN3rTzjHWGztVGADirejUG/GF8LC59htZuzqs5WqPc/U2VavNfTkh4Pp3huS312LCzsMUYs0dFAlUN4FVX/wUcOliM+z/IgK1HN3CKAkgy/HrGYM5eI/7+8VEo9vbldL74IQsPz9sOCLRDd055io6aqPrrk8bFncmbXw6ZEIRaGkEdgdh3+CwI5SDwFIQp2JpjFLLik/6vulGK948MAiUEpkAd1hw+i74Jgb9sWCEE0EKG1mZGaRXBkaOlaHNfIgFkSUGDyYHSGit2ZdRh8zkZjsQe0Gl5MNm5+4GTZWhSumNeeiU2zd2NxyZ1w9jrohAd6Qc095mQZdTXWXEsqwqbfy49uHpzXm2jyX4z1L4ZGzRDtpW0rJZdiR25hiff+bn+fT93eAMAoASOBjPkukYkhaqX9bPXrTPUWqbV1Jg0oYMTV1QlJt5XWGO7T2468kY4CnuNEUp940V7BCgBhMggyCYbpEbrZaqSDAwEMqWQeAFcoB76QA04uY3rnngOZrMDckUdIiUr4nUEYToOHAFqbTLKzAxlTIX+/SLeHxxMFpTtzx5+PO3cWxW1tsFE4OCCk9c/AJjZ2UEupCOGEPnoqtL0Wosc6dLkUROyAshgiArW7hsZI8yNqa8tTt+T9+KuI2UPOCRZ6BEb8O2I8b2XiD26hZ62YHFxrWMCZQo4gTu/fe0CiKI496a2wy0TwJkaVFg79yxSSAwQHTJkSQaYs0LICxx4jkASFQTruDOjYtXztaXlP+YeLnwg7VT5fJNNieAErjPJJdcbwrK0q9uqtqvQ/P43p4xPutobKAyQFAZ/LV80Mlq1YKS/vDFrf959azflvlxrdIRQtfNeR1lUoOVhvq5v5NuDJ6d8UukfMOFoHXu93iQl8W3lDLyIrDAohCA2SL1nYIDyAikoPZt37Ozc9Oyqx0UGnhO4jkyvXjeEQXM2Vx4SFahd9YEzAA6ZQa/hLMmhwtup/tL7jrzykZu35i49XdTQFwLXomzbfEA2WM8XjRoWNz/6uoTtJfrAP52qk1+0WCU/oTObYNyEpDBQjrLkCM1/UtTiG468suAje/OWZBcZbgLv9CBXgesNYWtuQ7vemGsAvj7ZuD6t3Dpd46IsoqgwgFD0CRO+GROszPerrtNu35qz5MCpqukMBPwV7mqQZeeR+YRI3f4RI+Je8hvYozJT1i7IqbHPZrLSrq4pnoQBEGUGvYZvGBilWdpdbPzo3PEzYw/uL3yrxij2JTxtb/zgMkN4ZOlM1FmVqzKEO17aUrVaoJ0/gSQzQFKAmAD+yKgoYW4PS0P23q2n/3Igreopk1XkOQ1/VU+0JCrgCNAvMWh5v+HxC2lyYtxRI1laXm9P5cBcEZy5FIU5H4LIQFVO31DupciG+h3Ze3IePp5ePs8ssRCOv2L80GlD+P1rt6PBBiQE8VdlCLo5O+qP5tWIKZ2pKTAGOJxxQPmwCH7BYGJeVZxWfPeWPSXzy2sskUTV8Yi6+RylVkWNwwZELEkYkrDCGBtz84ka+bUGkyPGFQbsaqSm+ybjw9Rb+mjlubqKyppjO7JfOV3Q8IgMQi6z67nDhjD7jdtRWC+jWyB3sSEsSzNc8ZezKm0vvH+o4a+dySA6ZAZB4Bz9wlX/HOcv/t2SVzZg4/aCpdlFDUPBueZ6X6Cp4aYoIzxInT1scOzL3VITDuWoQp4+XeN42m6XVJ48UtdeROdnI/WOUP27v2BdbM4p73ZkT8Ffc8uMEwnHgWup81UZwt2vz4BDVpBR5cCwGKHDhtBt/o7qNKONhXbku5IUBgUEPULV6yaEk5eDq6scu7YXLNqXXj5TUnDFOKCjOFvvMSTF6jalju7xqrZXnCOT6d7MrrLdRhQfjB+aposgvVDdP0r1ZpJsXVa0L+fmvT8XLWywSkmUpxduc2uXIdzx6gwY7TIi9NyVDSGzrmWdvZmscjtWnzZ+8kOW+eGrrS4650Egwl/IGBXFz0kw1R1L21fw1J5j554zmkQtp+Y94qolUYGKg9I3MfDDwaN7vm2Mi005ZaaLKxvsg31zuQnIjCEySJ0+OJjMDapvOHx8a+ZTGbnVL9glpm+KH9o0hD+8ORMKU5BbJyHOX2i3IVwpxTx6U575Qd1VVBebLVuj4mpHd9MuHh8gLcvdl3Xzsl1FB0urLAlE4OCKnsvthRcoJMZoWl7Dk/klx+8al1q1aOKQxGllcaG/T6uRXjVZpXCh4/24XA5HAQ4E1Qb7oK2NZGPP8JDVKbNGzhtcXP7VgZ15C7OLGu6SQVpUy55793fIq+v4loLLfSP0o2MNi20i43Xt9AaizMBzhPUOV/9ncgz/Ol94tts3X+auPZ5TOwYc9agBXAglBFTFwSyz8I17S96NOFnxx9Th3edOHpwwLD/Q78XcGvHPoihTd2RKO0rz1JVbYbmzVM1NS45NeG/c/ZFP9DiUtzzjxNmRze+76YVbkF3Ttldvt7yCmtbPNRwtM9/zc7F1Qnuqi7LinApiA/h9g6PVryUaatKOfpP74Y6j5bNESQGnvrrloLvgKAFUHKoaxYHrt+VtSM6rXJM6JnFBUu/4L9It2sXF1bZJ7e3a6ilUHIFDVDTHz5rmFPqpZicP7/fqnSN7vHlW5Y/iWtd11GnrWw78PsP4+pXOYSgMsMsM/mpyZkqi6uHxidqJALbX55VKdRYlU6sTqkCJu+/XvGp4noKqOJwuMd6x8ruThwtWHbpziKnqgUlJ+rtCAtT5DpmhA8cl3YbTfgmMZkfcoTLbsk0G9V4A01wqo9qq4NKfb04ZnilsEJPUbbjK5rSwwJHGUfGaJWPi1SMAfAb8ckGUAcAb0yckDh/SN/JfPCWiJCo+0qrKCYGzwaUDRH3gZNWctcsP7jdtPay9KdA+flSPwFcEFWcUFU9cDdp+OErAE+Bcg33kznzTBgArAQxwxditPfM9d50xPadpwwjEpkelT6hq5bRe/iMBzEPb7WJLADx+26Sk8T3j/LcokuJc1vkQlBDwag4NNiV+266iZas/2PG9/kTG/ukRyvCEYNXnoPSXv9lXECgBCJBTK876Mcd8AMBSAJ3q70+HRBE0/1jtDqw/3fBGnVUOuDTDJzdVB6P9+MM39fafBuButL8z6EEAN06fmDA7PFCTJYkKFB/7cDmOgFfzKG9wjF63NmPngf/sWdC3ouRvN0TTcXGhmj0SI02ZQN+AwDld2GWmP15hn7M623oYwKPo4GajSz3C5G355rsuzCAqzDkN6ARSOipO+8SkHtpxADZ1UP+vp43vPmrCsOhXtCquRhIVKD4YPyiUQ3Zp4+wfV6UfPbP64NSxcv0918erZgf7q87YmwJjX6E5fqi3KQl7S2wfHSy17QQw5arHueD/ha/SDIvlphxLcxzAc8Q2JFr93tQe2lQAHwLo7FrFCGDRxOFRqf16Bn3OE8IkybemC0Kc8YNNhv5QRtX8/360d7+05ySdyjeOHdlN/Yag4iwO2VfaczrhqXPJWWESx27ItWwFsAJAu7eA0yqjgiqjgs15lj+dqLCnanmnC2QMSArh103poR0D4BkA5S7WvRDAn26flHh9QpR+lywrkHys2SGlBLzAodHOEtbtKPhy45cHv/E/nrV5ksY0rHeEaiWj1KemC+B8n+rTVfb79p21HAbwKoC2t1g30ewRwj4+YniFpwQOmSFCz6ePjVPPAHAb3NjSrYndE4dHT540PPah0ABVviTJvhk/qDicrbGOX7Mhd3/G2uPPDaoonDcxSJwaFqg+KjL41BRHmqYLh8SCDpZa39h/1noAwOzL/Q4tbBDxXZbplaIGMTZYSyvHdNf8ZWx3zWi4qXtXGygAlo1PjRtxXUrEQo2KGiWHfMVtg56G5ykIT3Gq0Pjw1ytPHa3cfGzQDUrNrWNi1I9ptapyh8x8Sufm+KHBqqRsKbB8BWALgNGtvhfAiHU5pv9J7ab9+Mae+lQAbwOweFDfC6kD8OqN4xJGDUoJ/46AQRJ9MX6gsMkI3n+y5u8/rDi8XXXoVOUkjXnkoDi/dwhPRVH2tfyDM34oM0pT1+fZ9gD4CJf0YaJHz9nHDYvW3ArgMTjX/b5AFoBZU0bHTe8e43dYEhXIvhg/qDhUNIp912zJW3Pg6wOfRGZkfXNjJB3VLVSzsekCOp9C4AjAwKVVOB7dWWg7DuAlAEEAwIOxfwA+dGX8xWycOjZuR25hwyOncmtfNJrEANqUTLnsI3elvsiX+/0rjX0JAkfBOEryKyzXl/yYuWFwTvW/p03r9VBJz8hJR8oc8402JdqHShcgBNDwBA4Zmp9LrK8X1HHTrovWLCS+Vgfowjv4XseGLrxClyF0AaDLELpoossQugDQZQhdNNFlCF0A6DKELpr4f8oQbTGSk4PMAAAAAElFTkSuQmCC>>
+            <div class="header-title">
+                <h1>ABC SOLUTIONS</h1>
+                <p>Cấu hình Datalogger Năng lượng mặt trời</p>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="form-section">
+                <h2>Cấu hình WiFi</h2>
+                <div class="current-ssid-info">
+                    <span>WiFi hiện tại:</span>
+                    <strong id="current_ssid">Đang tải...</strong>
+                </div>
+                
+                <button type="button" class="button button-blue" onclick="scanWifi()">Quét WiFi</button>
+                <div id="loadingMessage" class="status-message">Nhấn nút để quét các mạng WiFi xung quanh.</div>
+
+                <table id="wifiListTable" class="wifi-list-table" style="display:none;">
+                    <thead><tr><th>SSID</th><th>Tín hiệu</th><th></th></tr></thead>
+                    <tbody></tbody>
+                </table>
+
+                <div id="manual-wifi-config">
+                    <h3>Hoặc cấu hình thủ công (cho WiFi ẩn)</h3>
+                    <div class="form-group">
+                        <label for="manual_ssid">Tên WiFi (SSID)</label>
+                        <input type="text" id="manual_ssid" class="input_text" placeholder="Nhập tên WiFi ẩn">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual_password">Mật khẩu WiFi</label>
+                        <input type="password" id="manual_password" class="input_text">
+                    </div>
+                    <button type="button" class="button button-green" onclick="updateWiFiManually()">Kết Nối Thủ Công</button>
+                </div>
+            </div>
+
+            <form id="serverConfigForm" class="form-section">
+                <h2>Cấu hình Server</h2>
+                <div class="form-group radio-group">
+                    <label>
+                        <input type="radio" name="serverMode" value="default" id="defaultMode" checked> Mặc định
+                    </label>
+                    <label>
+                        <input type="radio" name="serverMode" value="advanced" id="advancedMode"> Nâng cao
+                    </label>
+                </div>
+
+                <div id="advancedOptions" class="hidden">
+                    <div class="form-group">
+                        <label for="server">Hostname hoặc Địa chỉ Server</label>
+                        <input type="text" id="server" name="server" class="input_text" placeholder="vi-du: mqtt.yourserver.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="topic">Topic gửi dữ liệu</label>
+                        <input type="text" id="topic" name="topic" class="input_text" placeholder="vi-du: /inverter/data">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phương thức xác thực</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="authMethod" value="token" id="tokenAuth" checked> Token
+                            </label>
+                            <label>
+                                <input type="radio" name="authMethod" value="user_pass" id="userPassAuth"> Username/Password
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="token_auth_fields">
+                        <div class="form-group">
+                            <label for="token">Access Token</label>
+                            <input type="text" id="token" name="token" class="input_text">
+                        </div>
+                    </div>
+
+                    <div id="user_pass_auth_fields" class="hidden">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" class="input_text">
+                        </div>
+                        <div class="form-group">
+                            <label for="password_mqtt">Password</label>
+                            <input type="password" id="password_mqtt" name="password_mqtt" class="input_text">
+                        </div>
+                    </div>
+                </div>
+                 <button type="submit" class="button button-green">Lưu Cấu hình Server</button>
+            </form>
+
+             <div class="form-section">
+                <h2>Chức năng khác</h2>
+                <button type="button" class="button button-blue" onclick="goToUpdatePage()">Cập nhật Firmware (OTA)</button>
+            </div>
+
+            <div class="form-section">
+                <h2>Chế độ hoạt động</h2>
+                <button type="button" class="button button-gray" onclick="backToNormalMode()">Trở về chế độ hoạt động</button>
+            </div>
+        </div>
+
+        <div class="device-info">
+            <span id="product_model">Model: Đang tải...</span>
+            <span id="firmware_version">Firmware: Đang tải...</span>
+            <span id="build_number">Build: Đang tải...</span>
+        </div>
+    </div>
+    
+    <div id="wifiPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>Nhập mật khẩu WiFi</h2>
+            <div class="form-group">
+                <label for="modal_ssid_label">Mạng WiFi:</label>
+                <strong id="modal_ssid" style="color: var(--primary-color);"></strong>
+            </div>
+            <div class="form-group">
+                <label for="modal_password">Mật khẩu:</label>
+                <input type="password" id="modal_password" class="input_text" required>
+            </div>
+            <button type="button" class="button button-green" onclick="updateWiFiFromModal()">Kết nối</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {            
+            getCurrentData();
+            getDeviceInfo();
+            setInterval(()=>{getCurrentData()}, 1000);
+            
+            const advancedModeRadio = document.getElementById('advancedMode');
+            const defaultModeRadio = document.getElementById('defaultMode');
+            const advancedOptionsDiv = document.getElementById('advancedOptions');
+            function toggleAdvancedOptions() {
+                advancedOptionsDiv.classList.toggle('hidden', !advancedModeRadio.checked);
+            }
+            advancedModeRadio.addEventListener('change', toggleAdvancedOptions);
+            defaultModeRadio.addEventListener('change', toggleAdvancedOptions);
+            
+            const tokenAuthRadio = document.getElementById('tokenAuth');
+            const userPassAuthRadio = document.getElementById('userPassAuth');
+            const tokenFields = document.getElementById('token_auth_fields');
+            const userPassFields = document.getElementById('user_pass_auth_fields');
+
+            function toggleAuthFields() {
+                tokenFields.classList.toggle('hidden', !tokenAuthRadio.checked);
+                userPassFields.classList.toggle('hidden', !userPassAuthRadio.checked);
+            }
+            tokenAuthRadio.addEventListener('change', toggleAuthFields);
+            userPassAuthRadio.addEventListener('change', toggleAuthFields);            
+            
+            document.getElementById('serverConfigForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                saveServerConfig();
+            });
+        });                
+        function closeModal() { document.getElementById('wifiPasswordModal').style.display = 'none'; }
+        function selectNetwork(ssid) {
+            document.getElementById('modal_ssid').innerText = ssid;
+            document.getElementById('modal_password').value = '';
+            document.getElementById('wifiPasswordModal').style.display = 'flex';
+        }
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        function getSignalColor(dBm) {
+            if (dBm >= -50) return '#28a745'; if (dBm >= -67) return '#ffc107'; if (dBm >= -80) return '#fd7e14'; return '#dc3545';
+        }        
+        async function getDeviceInfo() {
+            try {
+                const response = await fetch('/device-info');
+                if (!response.ok) throw new Error('Network response was not ok.');
+                const info = await response.json();
+                document.getElementById('product_model').innerText = `Model: ${info.model || 'N/A'}`;
+                document.getElementById('firmware_version').innerText = `Firmware: ${info.firmware || 'N/A'}`;
+                document.getElementById('build_number').innerText = `Build: ${info.build || 'N/A'}`;
+            } catch (error) {
+                console.error('Lỗi khi lấy thông tin thiết bị:', error);
+            }
+        }                
+        async function getCurrentData() {
+            try {
+                const response = await fetch('/data'); if (!response.ok) throw new Error('Lỗi.');
+                const data = await response.text();
+                document.getElementById('current_ssid').innerText = data.split(",")[0] || "Chưa kết nối";
+            } catch (error) { console.error('Lỗi:', error); document.getElementById('current_ssid').innerText = "Lỗi"; }
+        }
+        async function scanWifi() {
+            const loadingMsg = document.getElementById('loadingMessage');
+            const wifiTable = document.getElementById('wifiListTable');
+            const wifiTableBody = wifiTable.querySelector('tbody');
+            loadingMsg.innerText = "Đang quét..."; loadingMsg.style.color = 'var(--text-color)'; wifiTable.style.display = 'none'; wifiTableBody.innerHTML = '';
+            try {
+                const response = await fetch('/scan_wifi'); if (!response.ok) throw new Error('Lỗi.');
+                const networks = await response.json();
+                networks.sort((a, b) => b.rssi - a.rssi);
+                if (networks.length === 0) { loadingMsg.innerText = "Không tìm thấy mạng WiFi nào."; return; }
+                networks.forEach(net => {
+                    const row = wifiTableBody.insertRow();
+                    row.innerHTML = `<td>${escapeHtml(net.ssid)}</td><td style="color: ${getSignalColor(net.rssi)};">${net.rssi} dBm</td><td><button class="button button-gray" style="width:auto; padding: 5px 10px; font-size: 0.8em;" onclick="selectNetwork('${escapeHtml(net.ssid)}')">Chọn</button></td>`;
+                });
+                wifiTable.style.display = 'table';
+                loadingMsg.innerText = `Tìm thấy ${networks.length} mạng.`;
+                loadingMsg.style.color = 'var(--success-color)';
+            } catch (error) { console.error('Lỗi:', error); loadingMsg.innerText = "Quét WiFi thất bại."; loadingMsg.style.color = 'var(--danger-color)';}
+        }
+        async function postWiFiUpdateRequest(ssid, password) {
+            if (!ssid) { alert("Tên WiFi (SSID) không được để trống."); return; }
+            const formData = new URLSearchParams();
+            formData.append('new_ssid', ssid);
+            formData.append('new_password', password);
+            try {
+                const response = await fetch('/updateWiFi', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: formData });
+                if (!response.ok) throw new Error('Lỗi.');
+                alert("Đã gửi yêu cầu cập nhật WiFi. Thiết bị sẽ khởi động lại.");
+                closeModal();
+                document.getElementById('current_ssid').innerText = "Đang kết nối...";
+            } catch (error) { console.error('Lỗi:', error); alert("Cập nhật WiFi thất bại.");}
+        }
+        function updateWiFiFromModal() {
+            const ssid = document.getElementById('modal_ssid').innerText;
+            const password = document.getElementById('modal_password').value;
+            postWiFiUpdateRequest(ssid, password);
+        }
+        function updateWiFiManually() {
+            const ssid = document.getElementById('manual_ssid').value;
+            const password = document.getElementById('manual_password').value;
+            postWiFiUpdateRequest(ssid, password);
+        }
+        async function saveServerConfig() {
+            const form = document.getElementById('serverConfigForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            if (data.serverMode === 'default') {
+                // Xóa các trường không cần thiết
+                delete data.server; delete data.topic; delete data.authMethod; delete data.token; delete data.username; delete data.password_mqtt;
+            } else {
+                 if (!data.server || !data.topic) { alert("Vui lòng nhập đầy đủ Hostname và Topic."); return; }
+                 // Dựa vào phương thức xác thực, xóa các trường không cần thiết
+                 if (data.authMethod === 'token') {
+                    delete data.username; delete data.password_mqtt;
+                    if (!data.token) { alert("Vui lòng nhập Token."); return; }
+                 } else { // user_pass
+                    delete data.token;
+                    if (!data.username) { alert("Vui lòng nhập Username."); return; }
+                 }
+            }
+            try {
+                const response = await fetch('/saveServer', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+                if (!response.ok) throw new Error('Lỗi máy chủ.');
+                const result = await response.json();
+                if (result.status === 'success') { alert('Lưu cấu hình server thành công!'); } 
+                else { throw new Error(result.message || 'Lỗi.'); }
+            } catch (error) { console.error('Lỗi:', error); alert(`Lưu cấu hình server thất bại: ${error.message}`);}
+        }
+
+        async function goToUpdatePage() {
+            window.location.href = '/update';
+        }
+
+        async function backToNormalMode() {
+            if (!confirm("Bạn có chắc muốn thoát chế độ cấu hình? Thiết bị sẽ khởi động lại.")) return;
+            try {
+                const response = await fetch('/normal', { method: 'POST' });
+                if (!response.ok) throw new Error('Lỗi.');
+                alert("Đang trở về chế độ hoạt động...");
+                document.body.innerHTML = "<h1>Thiết bị đang khởi động lại. Bạn có thể đóng trang này.</h1>";
+            } catch (error) { console.error('Lỗi:', error); alert("Không thể chuyển chế độ.");}
+        }
+    </script>
+</body>
+</html>
