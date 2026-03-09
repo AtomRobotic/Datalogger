@@ -60,7 +60,7 @@ void task_mqtt_client(void *pvParameters) {
         APP_LOGW(TAG, "MQTT host: %s, port: %d", _mqtt_host, _mqtt_port);
         mqtt_client.onMessage(mqtt_message_callback);        
         
-        if(strcmp(_mqtt_auth_method, "User/Pass") == 0)
+        if(strcmp(_mqtt_auth_method, "user_pass") == 0)
         {
             while(!mqtt_client.connect("2", _mqtt_username, _mqtt_password)) {
                 APP_LOGW(TAG, "MQTT connection failed with user/pass, retrying in 5 seconds...");
@@ -68,7 +68,7 @@ void task_mqtt_client(void *pvParameters) {
                 vTaskDelay(pdMS_TO_TICKS(5000));
             }
         }
-        else if(strcmp(_mqtt_auth_method, "Token") == 0)
+        else if(strcmp(_mqtt_auth_method, "token") == 0)
         {
             while(!mqtt_client.connect(_id, _mqtt_token, "")) {
                 APP_LOGW(TAG, "MQTT connection failed with token, retrying in 5 seconds...");
