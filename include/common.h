@@ -19,7 +19,6 @@
 #include <WiFiUdp.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncOTA.h>
 #include <ElegantOTA.h>
 
 #include <HardwareSerial.h>
