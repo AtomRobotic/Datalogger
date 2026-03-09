@@ -6,7 +6,7 @@
 /* Variables -----------------------------------------------------------------*/
 HardwareSerial                                  s_serial_port(2);
 ModbusMaster                                    s_modbus_node;
-static StaticJsonDocument<512 * 6>              doc;
+static JsonDocument                             doc;
 static String                                   mqtt_payload; 
 mqtt_message_t                                  mqtt_msg;
 

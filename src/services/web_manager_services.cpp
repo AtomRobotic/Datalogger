@@ -77,7 +77,7 @@ void start_ap_mode()
     APP_LOGI(TAG, "AP IP: %s", IP.toString().c_str());
 
     setup_http_server_endpoints();
-    AsyncElegantOTA.begin(&s_http_server);
+    ElegantOTA.begin(&s_http_server);
     s_http_server.begin();
     APP_LOGI(TAG, "HTTP Server started on port 80.");
 
@@ -104,7 +104,7 @@ void setup_http_server_endpoints() {
     });    
 
     s_http_server.on("/device-info", HTTP_GET, [](AsyncWebServerRequest *request){
-        StaticJsonDocument<200> doc;
+        JsonDocument doc;
         doc["model"] = PRODUCT_MODEL;
         doc["firmware"] = FIRMWARE_VERSION;
         doc["build"] = BUILD_NUMBER;
@@ -281,7 +281,7 @@ void task_event_handler(void *pvParameters)
                 {
                     APP_LOGI(TAG, "Processing 'Update Server' request. Payload: %s", evt.data.http.param1);
     
-                    StaticJsonDocument<512> doc; 
+                    JsonDocument doc; 
                     deserializeJson(doc, evt.data.http.param1);
                     
                     const char* mode = doc["serverMode"];
@@ -351,7 +351,7 @@ void task_event_handler(void *pvParameters)
                         s_current_ws_client_num = evt.data.ws.client_num;
                         APP_LOGI(TAG, "Handler: WS Client #%u connected.", s_current_ws_client_num);
                         
-                        ArduinoJson::StaticJsonDocument<100> json_doc;
+                        JsonDocument json_doc;
                         json_doc["state"] = "request_wifi";
                         
                         send_ws_json_to_client(s_current_ws_client_num, json_doc);
@@ -377,7 +377,7 @@ void task_event_handler(void *pvParameters)
                     {
                         APP_LOGI(TAG, "Handler: WS msg from #%u: %s", evt.data.ws.client_num, evt.data.ws.payload);
 
-                        ArduinoJson::StaticJsonDocument<256> json_doc;
+                        JsonDocument json_doc;
                         if (deserializeJson(json_doc, evt.data.ws.payload) == DeserializationError::Ok) {
                             const char* state = json_doc["state"];
                             if (state) {
@@ -391,7 +391,7 @@ void task_event_handler(void *pvParameters)
                                     _wifi_ssid_length = sizeof(_wifi_ssid);
                                     _wifi_password_length = sizeof(_wifi_password_length);
                                     
-                                    ArduinoJson::StaticJsonDocument<128> out_json_doc;
+                                    JsonDocument out_json_doc;
                                     out_json_doc["state"] = "send_topic";
                                     out_json_doc["topic"] = _mqtt_topic_pub; 
                                     send_ws_json_to_client(evt.data.ws.client_num, out_json_doc);
@@ -429,13 +429,13 @@ void task_event_handler(void *pvParameters)
             
             if (s_ws_fsm_state == FSM_WS_WAITING_FOR_WIFI && (current_tick - s_ws_last_sent_tick) > pdMS_TO_TICKS(3000)) {
                 APP_LOGW(TAG, "Handler: Resending 'request_wifi' due to timeout.");
-                ArduinoJson::StaticJsonDocument<100> json_doc;
+                JsonDocument json_doc;
                 json_doc["state"] = "request_wifi";
                 send_ws_json_to_client(s_current_ws_client_num, json_doc);
                 s_ws_last_sent_tick = current_tick; // Reset bộ đếm giờ
             } else if (s_ws_fsm_state == FSM_WS_WAITING_FOR_ACK && (current_tick - s_ws_last_sent_tick) > pdMS_TO_TICKS(3000)) {
                 APP_LOGW(TAG, "Handler: Resending 'send_topic' due to timeout.");
-                ArduinoJson::StaticJsonDocument<128> json_doc;
+                JsonDocument json_doc;
                 json_doc["state"] = "send_topic";
                 json_doc["topic"] = _mqtt_topic_pub;
                 send_ws_json_to_client(s_current_ws_client_num, json_doc);

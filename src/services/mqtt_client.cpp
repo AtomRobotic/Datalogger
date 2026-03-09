@@ -133,7 +133,7 @@ void mqtt_reset_to_default_config(void)
 }
 
 void mqtt_handle_remote_config(const char* payload) {
-    StaticJsonDocument<1024> doc;
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, payload);
 
     if (error) {
@@ -157,7 +157,7 @@ void mqtt_handle_remote_config(const char* payload) {
     bool server_updated = false;
 
     // --- Xử lý cấu hình WiFi ---
-    if (data.containsKey("wifi")) {
+    if (data["wifi"]) {
         JsonObject wifi_config = data["wifi"];
         strlcpy(_wifi_ssid, wifi_config["ssid"] | "", sizeof(_wifi_ssid));
         strlcpy(_wifi_password, wifi_config["password"] | "", sizeof(_wifi_password));
@@ -170,7 +170,7 @@ void mqtt_handle_remote_config(const char* payload) {
     }
 
     // --- Xử lý cấu hình Server ---
-    if (data.containsKey("server")) {
+    if (data["server"]) {
         JsonObject server_config = data["server"];
         const char* mode = server_config["mode"] | "default";
 
@@ -183,7 +183,7 @@ void mqtt_handle_remote_config(const char* payload) {
             strlcpy(_mqtt_host, server_config["host"] | "", sizeof(_mqtt_host));
             strlcpy(_mqtt_topic_pub, server_config["topic"] | "", sizeof(_mqtt_topic_pub));
 
-            if (server_config.containsKey("auth")) 
+            if (server_config["auth"]) 
             {
                 JsonObject auth_config = server_config["auth"];
                 const char* auth_method = auth_config["method"] | "token";

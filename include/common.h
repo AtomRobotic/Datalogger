@@ -20,7 +20,7 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncOTA.h>
-#include <AsyncElegantOTA.h>
+#include <ElegantOTA.h>
 
 #include <HardwareSerial.h>
 #include <ModbusMaster.h>
