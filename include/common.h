@@ -85,10 +85,10 @@
 #define NTP_SYNCED_BIT              (1 << 3)
 
 // SD card setting
-// #define SCK                         18
-// #define MISO                        19     
-// #define MOSI                        23
-// #define SD_CS_PIN                   5
+#define SCK                         18
+#define MISO                        19     
+#define MOSI                        23
+#define SD_CS_PIN                   5
 
 /* Struct --------------------------------------------------------------------*/
 typedef enum 

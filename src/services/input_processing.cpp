@@ -2,7 +2,7 @@
 #include "input_processing.h"
 
 /* Define --------------------------------------------------------------------*/
-#define BUTTON_PIN 22                  
+#define BUTTON_PIN 35                  
 #define DEBOUNCE_TIME_MS 50           
 #define LONG_PRESS_TIME_MS 2000       
 

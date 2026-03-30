@@ -112,7 +112,7 @@ void modbus_manager_task(void *pvParameters)
           APP_LOGE(TAG, "Malloc failed in Modbus Task!");
         }
         
-        // backup_manager_handle_data(mqtt_payload.c_str());
+        backup_manager_handle_data(mqtt_payload.c_str());
          
         doc.clear();  
         // warning_timeslot = 0; // Reset lại nếu đọc thành công

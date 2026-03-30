@@ -6,7 +6,7 @@
 #include "app_log.h"
 
 /* Define --------------------------------------------------------------------*/
-#define BUTTON_PIN                  22
+#define BUTTON_PIN                  35
 #define BUTTON_DEBOUNCE_MS          10
 #define BUTTON_SHORT_PRESS_TICK     5   // 50ms nếu task delay 50ms
 #define BUTTON_LONG_PRESS_TICK      10  // 1s nếu task delay 50ms

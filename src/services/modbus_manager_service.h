@@ -13,7 +13,7 @@
 #define SLAVE_ID            1
 #define BAUD_RATE           9600
 #define READ_INTERVAL_MS    pdMS_TO_TICKS(10000);
-#define RS485_EN            5
+#define RS485_EN            13
 #define ERROR_THRESHOLD     500     
 
 /* Struct --------------------------------------------------------------------*/

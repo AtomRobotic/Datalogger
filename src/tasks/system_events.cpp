@@ -119,7 +119,7 @@ void init_system_supervisor(void)
     init_input_processing();
 
     vTaskDelay(100);
-    // init_backup_manager();         
+    init_backup_manager();         
 
     delay(100);
 
