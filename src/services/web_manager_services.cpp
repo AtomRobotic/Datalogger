@@ -295,11 +295,18 @@ void task_event_handler(void *pvParameters)
                         const char* server_host = doc["server"];
                         const char* topic = doc["topic"];
                         const char* authMethod = doc["authMethod"];
+                        const char* topic_sub = doc["topic_sub"];
 
                         strcpy(_mqtt_auth_method, authMethod);
                         strcpy(_mqtt_topic_pub, topic);
                         strcpy(_mqtt_host, server_host);
-                                                
+                        
+                        if (topic_sub != nullptr && strlen(topic_sub) > 0) {
+                            strcpy(_mqtt_topic_sub, topic_sub);
+                        } else {
+                            memset(_mqtt_topic_sub, 0, sizeof(_mqtt_topic_sub));
+                        }
+
                         APP_LOGI(TAG, "Server mode: advanced, Host: %s, Topic: %s", server_host, topic);
                         
                         if (strcmp(authMethod, "token") == 0) {

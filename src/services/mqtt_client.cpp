@@ -48,7 +48,6 @@ void mqtt_message_callback(String &topic, String &payload)
 static void mqtt_publish_device_info(MQTTClient& mqtt_client) {
     JsonDocument doc;
     
-    // Gom các thông tin thiết bị từ common.h
     doc["product_name"] = PRODUCT_NAME;
     doc["product_model"] = PRODUCT_MODEL;
     doc["firmware_version"] = FIRMWARE_VERSION;
@@ -59,18 +58,18 @@ static void mqtt_publish_device_info(MQTTClient& mqtt_client) {
     String payload;
     serializeJson(doc, payload);
     
-    // Tạo topic info dựa trên topic data hiện tại
     String info_topic = String(_mqtt_topic_pub);
     
-    // Nếu topic data kết thúc bằng "/data", ta thay thế bằng "/info"
-    if (info_topic.endsWith("/data")) {
+    // XỬ LÝ CHUẨN TOPIC:
+    if (info_topic.indexOf("v1/devices/me") != -1) {
+        info_topic = "v1/devices/me/attributes"; // Chuyển info vào mục attributes của CoreIoT
+    } 
+    else if (info_topic.endsWith("/data")) {
         info_topic.replace("/data", "/info");
     } else {
-        // Nếu không có chuẩn /data ở cuối, ta nối thêm _info vào cho an toàn
         info_topic += "_info"; 
     }
     
-    // Đẩy gói JSON lên Broker
     mqtt_client.publish(info_topic, payload);
     APP_LOGI(TAG, "MQTT: Published device info to topic %s", info_topic.c_str());
 }
@@ -119,18 +118,19 @@ void task_mqtt_client(void *pvParameters) {
         mqtt_publish_device_info(mqtt_client);
         // -----------------------------------
         
-        if(mqtt_client.subscribe(_mqtt_topic_sub))
-        {
-            APP_LOGI(TAG, "Subcribe topic %s successful", _mqtt_topic_sub);
-        }
-        
-        if(mqtt_client.subscribe(_mqtt_topic_sub))
-        {
-            APP_LOGI(TAG, "Subcribe topic %s successful", _mqtt_topic_sub);
-        }
-        else
-        {
-            APP_LOGW(TAG, "Subcribe topic %s failed.", _mqtt_topic_sub);
+        if (strlen(_mqtt_topic_sub) > 0) {
+            // NẾU CÓ NHẬP TOPIC THÌ MỚI SUBSCRIBE
+            if(mqtt_client.subscribe(_mqtt_topic_sub))
+            {
+                APP_LOGI(TAG, "Subcribe topic %s successful", _mqtt_topic_sub);
+            }
+            else
+            {
+                APP_LOGW(TAG, "Subcribe topic %s failed.", _mqtt_topic_sub);
+            }
+        } else {
+            // NẾU BỎ TRỐNG THÌ BỎ QUA (KHÔNG ĐƯỢC CÓ LỆNH SUBSCRIBE NÀO NỮA KHỎI ĐÂY)
+            APP_LOGI(TAG, "No subscribe topic configured. Skipping subscribe.");
         }
 
         vTaskDelay(pdMS_TO_TICKS(5000));

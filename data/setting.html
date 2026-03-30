@@ -1,520 +1,1261 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cấu hình Datalogger - ABC Solutions</title>
+    <title>Datalogger Configuration</title>
     <style>
-        :root {
-            --primary-color: #0033A0;
-            --secondary-color: #0055D4;
-            --background-color: #f4f7f9;
-            --card-background-color: #ffffff;
-            --text-color: #333333;
-            --header-text-color: #ffffff;
-            --border-color: #e0e0e0;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --gray-color: #6c757d;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--background-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-            background-color: var(--card-background-color);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            height: 100vh;
             overflow: hidden;
         }
 
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* ── Header ── */
         .header {
-            background-color: var(--primary-color);
-            padding: 20px 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .header img {
-            height: 50px;
-            width: auto;
-            border-radius: 4px;
+        .header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
         }
 
-        .header-title h1 {
-            color: var(--header-text-color);
-            margin: 0;
-            font-size: 1.5em;
-        }
-        .header-title p {
-            color: var(--header-text-color);
-            margin: 0;
-            opacity: 0.9;
+        .header p {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
         }
 
-        .content-area {
-            padding: 25px;
+        /* ── Main Content ── */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
         }
 
-        .form-section {
-            margin-bottom: 25px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-        }
-        .form-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        h2 {
-            font-size: 1.2em;
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--secondary-color);
-            padding-left: 10px;
-        }
-        
-        h3 {
-            font-size: 1em;
-            color: var(--gray-color);
-            text-align: center;
-            margin-top: 20px;
-            font-weight: normal;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .form-group.inline-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input_text {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        .input_text:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-        }
-        
-        .radio-group label {
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-            margin-right: 20px;
-        }
-        
-        .radio-group input[type="radio"] {
-            margin-right: 8px;
-        }
-        
-        .button {
-            width: 100%;
-            padding: 12px 15px;
-            margin-top: 5px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, opacity 0.3s;
-            text-transform: uppercase;
-        }
-        
-        .button-green { background-color: var(--success-color); color: white; }
-        .button-green:hover { background-color: #218838; }
-        .button-blue { background-color: var(--secondary-color); color: white; }
-        .button-blue:hover { background-color: var(--primary-color); }
-        .button-gray { background-color: var(--gray-color); color: white; }
-        .button-gray:hover { background-color: #5a6268; }
-
-        .wifi-list-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        .wifi-list-table th, .wifi-list-table td {
-            text-align: left;
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .wifi-list-table th { background-color: #f8f9fa; }
-        
-        .status-message {
-            text-align: center;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .modal {
+        .page {
             display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
+            padding: 16px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .icon-wrapper {
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 25px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
+
+        .icon-wrapper svg {
+            width: 20px;
+            height: 20px;
         }
-        .close-button {
-            color: #aaa;
-            position: absolute;
-            top: 10px; right: 15px;
-            font-size: 28px;
-            font-weight: bold;
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* ── Status Box ── */
+        .status-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .status-box-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-box-content span:first-child {
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .status-box-content span.connected {
+            font-size: 12px;
+            font-weight: 600;
+            color: #15803d;
+        }
+
+        .status-box-content span.not-connected {
+            font-size: 12px;
+            font-style: italic;
+            color: #6b7280;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all .2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+        }
+
+        .btn-green {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #15803d;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ── Form ── */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all .2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+        }
+
+        /* ── Radio ── */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .radio-option:hover {
+            background: #f9fafb;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
-        .close-button:hover, .close-button:focus { color: black; }
 
-        .hidden { display: none; }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9em;
-            color: #888;
-            background-color: var(--background-color);
-        }
-        
-        .device-info {
-            font-size: 0.8em;
-            color: var(--gray-color);
-            text-align: center;
-            padding-bottom: 15px;
-        }
-        .device-info span {
-            display: inline-block;
-            margin: 0 10px;
+        .radio-option-content {
+            flex: 1;
         }
 
-        .current-ssid-info {
-            background-color: #e9ecef;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
+        .radio-option-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .radio-option-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* ── Advanced Section ── */
+        .advanced-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #faf5ff 0%, #e0e7ff 100%);
+            border: 1px solid #c4b5fd;
+            border-radius: 8px;
+        }
+
+        .auth-fields {
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        /* ── Subscribe Topics ── */
+        .subscribe-topic-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .subscribe-topic-row .form-input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .btn-remove-topic {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 38px;
+            min-width: 36px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: all .2s;
+        }
+
+        .btn-remove-topic:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+
+        .btn-remove-topic svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn-add-topic {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 8px 12px;
+            margin-top: 4px;
+            background: white;
+            border: 1px dashed #6b7280;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-add-topic:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .btn-add-topic svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ── File Upload ── */
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .file-upload:hover {
+            border-color: #16a34a;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-icon {
+            width: 40px;
+            height: 40px;
+            color: #9ca3af;
+            margin: 0 auto 8px;
+        }
+
+        .file-selected {
+            margin-top: 12px;
+            padding: 12px;
+            background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-selected svg {
+            width: 16px;
+            height: 16px;
+            color: #16a34a;
+            flex-shrink: 0;
+        }
+
+        .file-info h4 {
+            font-size: 12px;
+            font-weight: 500;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-info p {
+            font-size: 10px;
+            color: #6b7280;
+        }
+
+        /* ── Progress Bar ── */
+        .progress-container {
+            margin-top: 12px;
+        }
+
+        .progress-info {
             display: flex;
             justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #16a34a 0%, #059669 100%);
+            transition: width .3s ease;
+        }
+
+        /* ── Alert ── */
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border: 1px solid #bfdbfe;
+        }
+
+        .alert-info svg {
+            width: 16px;
+            height: 16px;
+            color: #2563eb;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-content h4 {
+            font-size: 12px;
+            font-weight: 500;
+            color: #1e3a8a;
+        }
+
+        .alert-content p {
+            font-size: 12px;
+            color: #1e40af;
+            margin-top: 4px;
+        }
+
+        /* ── Summary ── */
+        .summary-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .summary-box h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item span:first-child {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .summary-item span:last-child {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-ready {
+            color: #16a34a;
+        }
+
+        /* ── Bottom Navigation ── */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, .1);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            gap: 4px;
+            padding: 12px 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all .2s;
+            color: #6b7280;
+        }
+
+        .nav-item.active {
+            color: #2563eb;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-item.active svg {
+            stroke-width: 2.5;
+        }
+
+        .nav-item span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .nav-item.active span {
+            font-weight: 600;
+        }
+
+        /* ── Back Button ── */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #2563eb;
+            padding: 4px 0;
+        }
+
+        .back-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .back-btn:hover {
+            color: #1d4ed8;
+        }
+
+        /* ── Toast ── */
+        .toast-container {
+            position: fixed;
+            bottom: 100px;
+            left: 16px;
+            right: 16px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn .3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .toast-error {
+            background: #dc2626;
+            color: white;
+        }
+
+        .toast-loading {
+            background: #2563eb;
+            color: white;
+        }
+
+        .toast svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* ── Manual WiFi box ── */
+        .manual-form-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <header class="header">
-            <img src=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAYAAACKAxD9AAAACXBIWXMAAC4jAAAuIwF4pT92AAAKLWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDYwLCAyMDIwLzA1LzEyLTE2OjA0OjE3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIiB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjAzZGRhZGZiLTk3OGQtYjg0My05MjYwLWRiYTQ3NTM1ODJjZCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDoyMjdiMWUzMi1iODlmLWY1NDgtODc5NC1mMjMzYmJiNTY4YzUiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0iRDZBNjIxRTg2RjAwOUJBMjY0NDhCRDk5QUNEMTlEMjYiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiIHhtcDpDcmVhdGVEYXRlPSIyMDIyLTAzLTAzVDEwOjE3OjM0KzA3OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMy0wNC0wM1QxNDoyOTo1NSswNzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMy0wNC0wM1QxNDoyOTo1NSswNzowMCIgdGlmZjpJbWFnZVdpZHRoPSIxOTEzIiB0aWZmOkltYWdlTGVuZ3RoPSIxNjY2IiB0aWZmOlBob3RvbWV0cmljSW50ZXJwcmV0YXRpb249IjIiIHRpZmY6U2FtcGxlc1BlclBpeGVsPSIzIiB0aWZmOlhSZXNvbHV0aW9uPSIxMTgvMSIgdGlmZjpZUmVzb2x1dGlvbj0iMTE4LzEiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjMiIGV4aWY6RXhpZlZlcnNpb249IjAyMzEiIGV4aWY6Q29sb3JTcGFjZT0iNjU1MzUiIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSIxOTEzIiBleGlmOlBpeGVsWURpbWVuc2lvbj0iMTY2NiI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmRmZWVjZDJiLWMzNDUtMWI0ZC04MDZiLTU0Njk0YTM5MTVjNyIgc3RFdnQ6d2hlbj0iMjAyMi0wNS0wOVQxNDoxODoxNiswNzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjIgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjb252ZXJ0ZWQiIHN0RXZ0OnBhcmFtZXRlcnM9ImZyb20gaW1hZ2UvanBlZyB0byBpbWFnZS9wbmciLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImRlcml2ZWQiIHN0RXZ0OnBhcmFtZXRlcnM9ImNvbnZlcnRlZCBmcm9tIGltYWdlL2pwZWcgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDowZmEwY2U2NS1mYWQzLTc1NDgtOTEwYS1iNzAzZjYwNTdlY2EiIHN0RXZ0OndoZW49IjIwMjItMDUtMDlUMTQ6MTg6MTYrMDc6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4yIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MjI3YjFlMzItYjg5Zi1mNTQ4LTg3OTQtZjIzM2JiYjU2OGM1IiBzdEV2dDp3aGVuPSIyMDIzLTA0LTAzVDE0OjI5OjU1KzA3OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOmRmZWVjZDJiLWMzNDUtMWI0ZC04MDZiLTU0Njk0YTM5MTVjNyIgc3RSZWY6ZG9jdW1lbnRJRD0iRDZBNjIxRTg2RjAwOUJBMjY0NDhCRDk5QUNEMTlEMjYiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0iRDZBNjIxRTg2RjAwOUJBMjY0NDhCRDk5QUNEMTlEMjYiLz4gPHRpZmY6Qml0c1BlclNhbXBsZT4gPHJkZjpTZXE+IDxyZGY6bGk+ODwvcmRmOmxpPiA8cmRmOmxpPjg8L3JkZjpsaT4gPHJkZjpsaT44PC9yZGY6bGk+IDwvcmRmOlNlcT4gPC90aWZmOkJpdHNQZXJTYW1wbGU+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+E0uhAQAAI1FJREFUeJztnXd8lFXWx3/3Ps8zNb0XEhJC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>>
-            <div class="header-title">
-                <h1>ABC SOLUTIONS</h1>
-                <p>Cấu hình Datalogger Năng lượng mặt trời</p>
+    <div class="app-container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Datalogger Config</h1>
+            <p>Device Configuration</p>
+        </div>
+
+        <div class="main-content">
+
+            <!-- ══════════════ WiFi Page ══════════════ -->
+            <div id="wifi-page" class="page active">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper" style="background:#dbeafe;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#2563eb"
+                                stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Configure WiFi</h2>
+                            <p>Enter network credentials manually</p>
+                        </div>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="status-box-content">
+                            <span>Connected:</span>
+                            <span id="wifi-status" class="not-connected">Not connected</span>
+                        </div>
+                    </div>
+
+                    <div class="manual-form-box">
+                        <div class="form-group">
+                            <label class="form-label">Network Name (SSID)</label>
+                            <input type="text" class="form-input" id="manual-ssid" placeholder="Enter network name">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Password (Optional)</label>
+                            <input type="password" class="form-input" id="manual-password" placeholder="Enter password">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="manualConnect()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
+                        </svg>
+                        <span>Connect to Network</span>
+                    </button>
+                </div>
             </div>
-        </header>
 
-        <div class="content-area">
-            <div class="form-section">
-                <h2>Cấu hình WiFi</h2>
-                <div class="current-ssid-info">
-                    <span>WiFi hiện tại:</span>
-                    <strong id="current_ssid">Đang tải...</strong>
-                </div>
-                
-                <button type="button" class="button button-blue" onclick="scanWifi()">Quét WiFi</button>
-                <div id="loadingMessage" class="status-message">Nhấn nút để quét các mạng WiFi xung quanh.</div>
-
-                <table id="wifiListTable" class="wifi-list-table" style="display:none;">
-                    <thead><tr><th>SSID</th><th>Tín hiệu</th><th></th></tr></thead>
-                    <tbody></tbody>
-                </table>
-
-                <div id="manual-wifi-config">
-                    <h3>Hoặc cấu hình thủ công (cho WiFi ẩn)</h3>
-                    <div class="form-group">
-                        <label for="manual_ssid">Tên WiFi (SSID)</label>
-                        <input type="text" id="manual_ssid" class="input_text" placeholder="Nhập tên WiFi ẩn">
-                    </div>
-                    <div class="form-group">
-                        <label for="manual_password">Mật khẩu WiFi</label>
-                        <input type="password" id="manual_password" class="input_text">
-                    </div>
-                    <button type="button" class="button button-green" onclick="updateWiFiManually()">Kết Nối Thủ Công</button>
-                </div>
-            </div>
-
-            <form id="serverConfigForm" class="form-section">
-                <h2>Cấu hình Server</h2>
-                <div class="form-group radio-group">
-                    <label>
-                        <input type="radio" name="serverMode" value="default" id="defaultMode" checked> Mặc định
-                    </label>
-                    <label>
-                        <input type="radio" name="serverMode" value="advanced" id="advancedMode"> Nâng cao
-                    </label>
-                </div>
-
-                <div id="advancedOptions" class="hidden">
-                    <div class="form-group">
-                        <label for="server">Hostname hoặc Địa chỉ Server</label>
-                        <input type="text" id="server" name="server" class="input_text" placeholder="vi-du: mqtt.yourserver.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="topic">Topic gửi dữ liệu</label>
-                        <input type="text" id="topic" name="topic" class="input_text" placeholder="vi-du: /inverter/data">
+            <!-- ══════════════ Server Page ══════════════ -->
+            <div id="server-page" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper" style="background:#f3e8ff;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#9333ea"
+                                stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Server Configuration</h2>
+                            <p>Configure server settings</p>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Phương thức xác thực</label>
+                    <div style="margin-bottom:20px;">
+                        <label class="form-label" style="font-weight:600;margin-bottom:12px;">Configuration Mode</label>
                         <div class="radio-group">
-                            <label>
-                                <input type="radio" name="authMethod" value="token" id="tokenAuth" checked> Token
+                            <label class="radio-option">
+                                <input type="radio" name="server-mode" value="default" checked
+                                    onchange="toggleServerMode()">
+                                <div class="radio-option-content">
+                                    <div class="radio-option-title">Default Mode</div>
+                                    <div class="radio-option-desc">Standard configuration</div>
+                                </div>
                             </label>
-                            <label>
-                                <input type="radio" name="authMethod" value="user_pass" id="userPassAuth"> Username/Password
+                            <label class="radio-option">
+                                <input type="radio" name="server-mode" value="advanced" onchange="toggleServerMode()">
+                                <div class="radio-option-content">
+                                    <div class="radio-option-title">Advanced Mode</div>
+                                    <div class="radio-option-desc">Custom settings</div>
+                                </div>
                             </label>
-                        </div>
-                    </div>
-                    
-                    <div id="token_auth_fields">
-                        <div class="form-group">
-                            <label for="token">Access Token</label>
-                            <input type="text" id="token" name="token" class="input_text">
                         </div>
                     </div>
 
-                    <div id="user_pass_auth_fields" class="hidden">
+                    <div id="advanced-section" class="advanced-section hidden">
+
                         <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" class="input_text">
+                            <label class="form-label">Hostname</label>
+                            <input type="text" class="form-input" id="hostname" placeholder="Enter server hostname">
                         </div>
+
                         <div class="form-group">
-                            <label for="password_mqtt">Password</label>
-                            <input type="password" id="password_mqtt" name="password_mqtt" class="input_text">
+                            <label class="form-label">Publish Topic</label>
+                            <input type="text" class="form-input" id="topic" placeholder="e.g. device/data">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Subscribe Topics</label>
+                            <div id="subscribe-topics-list"></div>
+                            <button class="btn-add-topic" onclick="addSubscribeTopic()">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Add Topic
+                            </button>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <label class="form-label" style="font-weight:600;margin-bottom:12px;">Authentication
+                                Method</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="auth-method" value="token" checked
+                                        onchange="toggleAuthMethod()">
+                                    <div class="radio-option-content">
+                                        <div class="radio-option-title">Access Token</div>
+                                        <div class="radio-option-desc">Authenticate using token</div>
+                                    </div>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="auth-method" value="userpass"
+                                        onchange="toggleAuthMethod()">
+                                    <div class="radio-option-content">
+                                        <div class="radio-option-title">Username &amp; Password</div>
+                                        <div class="radio-option-desc">Authenticate using credentials</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="auth-fields">
+                                <div id="token-auth">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="form-label">Access Token</label>
+                                        <input type="password" class="form-input" id="access-token"
+                                            placeholder="Enter access token">
+                                    </div>
+                                </div>
+                                <div id="userpass-auth" class="hidden">
+                                    <div class="form-group">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-input" id="username"
+                                            placeholder="Enter username">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="form-label">Password</label>
+                                        <input type="password" class="form-input" id="server-password"
+                                            placeholder="Enter password">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <button class="btn btn-primary" onclick="saveServerConfig()" style="margin-top:24px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+                        </svg>
+                        <span>Save Configuration</span>
+                    </button>
                 </div>
-                 <button type="submit" class="button button-green">Lưu Cấu hình Server</button>
-            </form>
-
-             <div class="form-section">
-                <h2>Chức năng khác</h2>
-                <button type="button" class="button button-blue" onclick="goToUpdatePage()">Cập nhật Firmware (OTA)</button>
             </div>
 
-            <div class="form-section">
-                <h2>Chế độ hoạt động</h2>
-                <button type="button" class="button button-gray" onclick="backToNormalMode()">Trở về chế độ hoạt động</button>
+            <!-- ══════════════ Other Page ══════════════ -->
+            <div id="other-page" class="page">
+
+                <!-- OTA shortcut card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper" style="background:#dcfce7;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#16a34a"
+                                stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>OTA Firmware Update</h2>
+                            <p>Upload new firmware to device</p>
+                        </div>
+                    </div>
+                    <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">Update device firmware over the air.
+                        Only verified <code>.bin</code> files are accepted.</p>
+                    <button class="btn btn-green" onclick="goToOTA()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                        <span>Go to OTA Update</span>
+                    </button>
+                </div>
+
+                <!-- Finish Configuration -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon-wrapper" style="background:#dbeafe;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#2563eb"
+                                stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Finish Configuration</h2>
+                            <p>Complete setup</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-box" style="margin-bottom:16px;">
+                        <h3>Configuration Summary</h3>
+                        <div>
+                            <div class="summary-item">
+                                <span>WiFi Configuration</span>
+                                <span id="summary-wifi" style="color:#6b7280;">—</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Server Configuration</span>
+                                <span id="summary-server" style="color:#6b7280;">—</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Subscribe Topics</span>
+                                <span id="summary-topics" style="color:#6b7280;">—</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Firmware Version</span>
+                                <span style="color:#111827;">v1.2.3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-gradient" onclick="finishConfiguration()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Finish Configuration</span>
+                    </button>
+                </div>
             </div>
+
+            <!-- ══════════════ OTA Page ══════════════ -->
+            
+
+        </div><!-- /main-content -->
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchPage('wifi', this)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
+                </svg>
+                <span>WiFi</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('server', this)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+                </svg>
+                <span>Server</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('other', this)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Other</span>
+            </button>
         </div>
 
-        <div class="device-info">
-            <span id="product_model">Model: Đang tải...</span>
-            <span id="firmware_version">Firmware: Đang tải...</span>
-            <span id="build_number">Build: Đang tải...</span>
-        </div>
-    </div>
-    
-    <div id="wifiPasswordModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <h2>Nhập mật khẩu WiFi</h2>
-            <div class="form-group">
-                <label for="modal_ssid_label">Mạng WiFi:</label>
-                <strong id="modal_ssid" style="color: var(--primary-color);"></strong>
-            </div>
-            <div class="form-group">
-                <label for="modal_password">Mật khẩu:</label>
-                <input type="password" id="modal_password" class="input_text" required>
-            </div>
-            <button type="button" class="button button-green" onclick="updateWiFiFromModal()">Kết nối</button>
-        </div>
-    </div>
+    </div><!-- /app-container -->
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {            
-            getCurrentData();
-            getDeviceInfo();
-            setInterval(()=>{getCurrentData()}, 1000);
-            
-            const advancedModeRadio = document.getElementById('advancedMode');
-            const defaultModeRadio = document.getElementById('defaultMode');
-            const advancedOptionsDiv = document.getElementById('advancedOptions');
-            function toggleAdvancedOptions() {
-                advancedOptionsDiv.classList.toggle('hidden', !advancedModeRadio.checked);
-            }
-            advancedModeRadio.addEventListener('change', toggleAdvancedOptions);
-            defaultModeRadio.addEventListener('change', toggleAdvancedOptions);
-            
-            const tokenAuthRadio = document.getElementById('tokenAuth');
-            const userPassAuthRadio = document.getElementById('userPassAuth');
-            const tokenFields = document.getElementById('token_auth_fields');
-            const userPassFields = document.getElementById('user_pass_auth_fields');
+        // ════════════════════════════════════════════════════
+        //  State
+        // ════════════════════════════════════════════════════
+        let currentPage = 'wifi';
+        let isConnecting = false;
+        let subscribeTopics = [];   // [{ id, value }]
+        let topicIdCounter = 0;
 
-            function toggleAuthFields() {
-                tokenFields.classList.toggle('hidden', !tokenAuthRadio.checked);
-                userPassFields.classList.toggle('hidden', !userPassAuthRadio.checked);
-            }
-            tokenAuthRadio.addEventListener('change', toggleAuthFields);
-            userPassAuthRadio.addEventListener('change', toggleAuthFields);            
-            
-            document.getElementById('serverConfigForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                saveServerConfig();
-            });
-        });                
-        function closeModal() { document.getElementById('wifiPasswordModal').style.display = 'none'; }
-        function selectNetwork(ssid) {
-            document.getElementById('modal_ssid').innerText = ssid;
-            document.getElementById('modal_password').value = '';
-            document.getElementById('wifiPasswordModal').style.display = 'flex';
-        }
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-        function getSignalColor(dBm) {
-            if (dBm >= -50) return '#28a745'; if (dBm >= -67) return '#ffc107'; if (dBm >= -80) return '#fd7e14'; return '#dc3545';
-        }        
+        // ════════════════════════════════════════════════════
+        //  Init & Auto Refresh Data
+        // ════════════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+            getDeviceInfo();
+            getCurrentData();
+            // Cập nhật trạng thái WiFi mỗi 2 giây
+            setInterval(getCurrentData, 2000);
+        });
+
         async function getDeviceInfo() {
             try {
-                const response = await fetch('/device-info');
-                if (!response.ok) throw new Error('Network response was not ok.');
-                const info = await response.json();
-                document.getElementById('product_model').innerText = `Model: ${info.model || 'N/A'}`;
-                document.getElementById('firmware_version').innerText = `Firmware: ${info.firmware || 'N/A'}`;
-                document.getElementById('build_number').innerText = `Build: ${info.build || 'N/A'}`;
-            } catch (error) {
-                console.error('Lỗi khi lấy thông tin thiết bị:', error);
-            }
-        }                
+                const res = await fetch('/device-info');
+                if (!res.ok) throw new Error();
+                const info = await res.json();
+
+                // Cập nhật version trên giao diện Summary
+                document.querySelectorAll('.summary-item span:last-child').forEach(el => {
+                    if (el.textContent.includes('v1.2.3')) {
+                        el.textContent = info.firmware || 'N/A';
+                    }
+                });
+            } catch (e) { console.error('Failed to get device info'); }
+        }
+
         async function getCurrentData() {
             try {
-                const response = await fetch('/data'); if (!response.ok) throw new Error('Lỗi.');
-                const data = await response.text();
-                document.getElementById('current_ssid').innerText = data.split(",")[0] || "Chưa kết nối";
-            } catch (error) { console.error('Lỗi:', error); document.getElementById('current_ssid').innerText = "Lỗi"; }
+                const res = await fetch('/data');
+                if (!res.ok) throw new Error();
+                const data = await res.text();
+                const ssid = data.split(",")[0];
+
+                const statusEl = document.getElementById('wifi-status');
+                const summaryWifiEl = document.getElementById('summary-wifi');
+
+                if (ssid && ssid !== "Chưa kết nối" && ssid.trim() !== "") {
+                    statusEl.textContent = ssid;
+                    statusEl.className = 'connected';
+                    summaryWifiEl.textContent = '✓ ' + ssid;
+                    summaryWifiEl.className = 'status-ready';
+                } else {
+                    statusEl.textContent = 'Not connected';
+                    statusEl.className = 'not-connected';
+                    summaryWifiEl.textContent = '—';
+                    summaryWifiEl.className = '';
+                }
+            } catch (e) { }
         }
-        async function scanWifi() {
-            const loadingMsg = document.getElementById('loadingMessage');
-            const wifiTable = document.getElementById('wifiListTable');
-            const wifiTableBody = wifiTable.querySelector('tbody');
-            loadingMsg.innerText = "Đang quét..."; loadingMsg.style.color = 'var(--text-color)'; wifiTable.style.display = 'none'; wifiTableBody.innerHTML = '';
-            try {
-                const response = await fetch('/scan_wifi'); if (!response.ok) throw new Error('Lỗi.');
-                const networks = await response.json();
-                networks.sort((a, b) => b.rssi - a.rssi);
-                if (networks.length === 0) { loadingMsg.innerText = "Không tìm thấy mạng WiFi nào."; return; }
-                networks.forEach(net => {
-                    const row = wifiTableBody.insertRow();
-                    row.innerHTML = `<td>${escapeHtml(net.ssid)}</td><td style="color: ${getSignalColor(net.rssi)};">${net.rssi} dBm</td><td><button class="button button-gray" style="width:auto; padding: 5px 10px; font-size: 0.8em;" onclick="selectNetwork('${escapeHtml(net.ssid)}')">Chọn</button></td>`;
-                });
-                wifiTable.style.display = 'table';
-                loadingMsg.innerText = `Tìm thấy ${networks.length} mạng.`;
-                loadingMsg.style.color = 'var(--success-color)';
-            } catch (error) { console.error('Lỗi:', error); loadingMsg.innerText = "Quét WiFi thất bại."; loadingMsg.style.color = 'var(--danger-color)';}
+
+        // ════════════════════════════════════════════════════
+        //  Page Navigation
+        // ════════════════════════════════════════════════════
+        function switchPage(page, navEl) {
+            currentPage = page;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${page}-page`).classList.add('active');
+
+            const effectivePage = (page === 'ota') ? 'other' : page;
+            document.querySelectorAll('.nav-item').forEach((item, idx) => {
+                item.classList.remove('active');
+                const pages = ['wifi', 'server', 'other'];
+                if (pages[idx] === effectivePage) item.classList.add('active');
+            });
         }
-        async function postWiFiUpdateRequest(ssid, password) {
-            if (!ssid) { alert("Tên WiFi (SSID) không được để trống."); return; }
+
+        function goToOTA() { 
+        // Chuyển hướng trình duyệt sang trang OTA mặc định của ESP32
+        window.location.href = '/update'; 
+        
+        // Hoặc nếu bạn muốn mở OTA ở một tab mới thì dùng lệnh dưới đây thay thế:
+        // window.open('/update', '_blank');
+    }
+
+        // ════════════════════════════════════════════════════
+        //  WiFi – Update Credentials
+        // ════════════════════════════════════════════════════
+        async function manualConnect() {
+            const ssid = document.getElementById('manual-ssid').value;
+            const password = document.getElementById('manual-password').value;
+
+            if (!ssid) return showToast('error', 'Network Name (SSID) cannot be empty!');
+
+            isConnecting = true;
+            showToast('loading', 'Sending WiFi credentials...');
+
             const formData = new URLSearchParams();
             formData.append('new_ssid', ssid);
             formData.append('new_password', password);
+
             try {
-                const response = await fetch('/updateWiFi', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: formData });
-                if (!response.ok) throw new Error('Lỗi.');
-                alert("Đã gửi yêu cầu cập nhật WiFi. Thiết bị sẽ khởi động lại.");
-                closeModal();
-                document.getElementById('current_ssid').innerText = "Đang kết nối...";
-            } catch (error) { console.error('Lỗi:', error); alert("Cập nhật WiFi thất bại.");}
-        }
-        function updateWiFiFromModal() {
-            const ssid = document.getElementById('modal_ssid').innerText;
-            const password = document.getElementById('modal_password').value;
-            postWiFiUpdateRequest(ssid, password);
-        }
-        function updateWiFiManually() {
-            const ssid = document.getElementById('manual_ssid').value;
-            const password = document.getElementById('manual_password').value;
-            postWiFiUpdateRequest(ssid, password);
-        }
-        async function saveServerConfig() {
-            const form = document.getElementById('serverConfigForm');
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            if (data.serverMode === 'default') {
-                // Xóa các trường không cần thiết
-                delete data.server; delete data.topic; delete data.authMethod; delete data.token; delete data.username; delete data.password_mqtt;
-            } else {
-                 if (!data.server || !data.topic) { alert("Vui lòng nhập đầy đủ Hostname và Topic."); return; }
-                 // Dựa vào phương thức xác thực, xóa các trường không cần thiết
-                 if (data.authMethod === 'token') {
-                    delete data.username; delete data.password_mqtt;
-                    if (!data.token) { alert("Vui lòng nhập Token."); return; }
-                 } else { // user_pass
-                    delete data.token;
-                    if (!data.username) { alert("Vui lòng nhập Username."); return; }
-                 }
+                const res = await fetch('/updateWiFi', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error();
+
+                showToast('success', 'WiFi config sent! Device will reconnect shortly.');
+                document.getElementById('manual-ssid').value = '';
+                document.getElementById('manual-password').value = '';
+            } catch (e) {
+                showToast('error', 'Failed to update WiFi. Server error.');
+            } finally {
+                isConnecting = false;
             }
-            try {
-                const response = await fetch('/saveServer', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
-                if (!response.ok) throw new Error('Lỗi máy chủ.');
-                const result = await response.json();
-                if (result.status === 'success') { alert('Lưu cấu hình server thành công!'); } 
-                else { throw new Error(result.message || 'Lỗi.'); }
-            } catch (error) { console.error('Lỗi:', error); alert(`Lưu cấu hình server thất bại: ${error.message}`);}
         }
 
-        async function goToUpdatePage() {
-            window.location.href = '/update';
+        // ════════════════════════════════════════════════════
+        //  Server – UI Toggles
+        // ════════════════════════════════════════════════════
+        function toggleServerMode() {
+            const mode = document.querySelector('input[name="server-mode"]:checked').value;
+            const advancedSection = document.getElementById('advanced-section');
+            if (mode === 'advanced') {
+                advancedSection.classList.remove('hidden');
+            } else {
+                advancedSection.classList.add('hidden');
+            }
         }
 
-        async function backToNormalMode() {
-            if (!confirm("Bạn có chắc muốn thoát chế độ cấu hình? Thiết bị sẽ khởi động lại.")) return;
-            try {
-                const response = await fetch('/normal', { method: 'POST' });
-                if (!response.ok) throw new Error('Lỗi.');
-                alert("Đang trở về chế độ hoạt động...");
-                document.body.innerHTML = "<h1>Thiết bị đang khởi động lại. Bạn có thể đóng trang này.</h1>";
-            } catch (error) { console.error('Lỗi:', error); alert("Không thể chuyển chế độ.");}
+        function toggleAuthMethod() {
+            const method = document.querySelector('input[name="auth-method"]:checked').value;
+            const tokenAuth = document.getElementById('token-auth');
+            const userpassAuth = document.getElementById('userpass-auth');
+            if (method === 'token') {
+                tokenAuth.classList.remove('hidden');
+                userpassAuth.classList.add('hidden');
+            } else {
+                tokenAuth.classList.add('hidden');
+                userpassAuth.classList.remove('hidden');
+            }
         }
+
+        // ════════════════════════════════════════════════════
+        //  Subscribe Topics Array Manager
+        // ════════════════════════════════════════════════════
+        function addSubscribeTopic() {
+            const id = ++topicIdCounter;
+            subscribeTopics.push({ id, value: '' });
+            renderSubscribeTopics();
+            setTimeout(() => {
+                const input = document.getElementById(`sub-input-${id}`);
+                if (input) input.focus();
+            }, 30);
+        }
+
+        function removeSubscribeTopic(id) {
+            subscribeTopics = subscribeTopics.filter(t => t.id !== id);
+            renderSubscribeTopics();
+        }
+
+        function updateTopicValue(id, value) {
+            const topic = subscribeTopics.find(t => t.id === id);
+            if (topic) topic.value = value;
+        }
+
+        function renderSubscribeTopics() {
+            const list = document.getElementById('subscribe-topics-list');
+            if (!list) return;
+            if (subscribeTopics.length === 0) { list.innerHTML = ''; return; }
+            list.innerHTML = subscribeTopics.map(t => `
+            <div class="subscribe-topic-row">
+                <input type="text" id="sub-input-${t.id}" class="form-input" placeholder="e.g. v1/devices/me/rpc/request/+" value="${escapeHtml(t.value)}" oninput="updateTopicValue(${t.id}, this.value)">
+                <button class="btn-remove-topic" onclick="removeSubscribeTopic(${t.id})" title="Remove">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        `).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ════════════════════════════════════════════════════
+        //  Server – Save Configuration to Backend
+        // ════════════════════════════════════════════════════
+        async function saveServerConfig() {
+            const mode = document.querySelector('input[name="server-mode"]:checked').value;
+            let payload = { serverMode: mode };
+
+            if (mode === 'advanced') {
+                payload.server = document.getElementById('hostname').value;
+                payload.topic = document.getElementById('topic').value;
+
+                if (!payload.server || !payload.topic) {
+                    return showToast('error', 'Hostname and Publish Topic are required!');
+                }
+
+                // Gộp mảng các topic thành 1 chuỗi cách nhau bằng dấu phẩy
+                const topicsList = subscribeTopics.map(t => t.value).filter(v => v.trim() !== '');
+                payload.topic_sub = topicsList.join(',');
+
+                payload.authMethod = document.querySelector('input[name="auth-method"]:checked').value;
+                if (payload.authMethod === 'token') {
+                    payload.token = document.getElementById('access-token').value;
+                    if (!payload.token) return showToast('error', 'Token is required!');
+                } else {
+                    payload.username = document.getElementById('username').value;
+                    payload.password_mqtt = document.getElementById('server-password').value;
+                    if (!payload.username) return showToast('error', 'Username is required!');
+                }
+            }
+
+            try {
+                showToast('loading', 'Saving configuration to device...');
+                const res = await fetch('/saveServer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error();
+
+                showToast('success', 'Server configuration saved successfully!');
+                document.getElementById('summary-server').textContent = '✓ Ready';
+                document.getElementById('summary-server').className = 'status-ready';
+
+                if (mode === 'advanced') {
+                    const count = subscribeTopics.filter(v => v.value.trim() !== '').length;
+                    document.getElementById('summary-topics').textContent = count > 0 ? `${count} topic(s)` : '—';
+                } else {
+                    document.getElementById('summary-topics').textContent = 'Default';
+                }
+            } catch (e) {
+                showToast('error', 'Failed to save server config.');
+            }
+        }
+
+
+        
+        // ════════════════════════════════════════════════════
+        //  Finish Configuration -> Normal Mode
+        // ════════════════════════════════════════════════════
+        async function finishConfiguration() {
+            if (!confirm("Are you sure you want to exit setup? The device will reboot to normal mode.")) return;
+
+            try {
+                showToast('loading', 'Rebooting device...');
+                await fetch('/normal', { method: 'POST' });
+
+                document.body.innerHTML = `
+                <div style="display: flex; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6;">
+                    <svg class="spinner" style="width:50px; height:50px; color:#2563eb; margin-bottom: 20px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+                    <h2 style="color: #111827; font-family: sans-serif;">Device is rebooting</h2>
+                    <p style="color: #6b7280; font-family: sans-serif; margin-top: 10px;">Please wait while the datalogger switches to normal mode.</p>
+                </div>
+            `;
+            } catch (e) {
+                showToast('error', 'Failed to send reboot command.');
+            }
+        }
+
+        // ════════════════════════════════════════════════════
+        //  Toast Helper
+        // ════════════════════════════════════════════════════
+        let toastTimeout;
+        function showToast(type, message) {
+            const container = document.getElementById('toast-container');
+            const icons = {
+                success: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                error: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                loading: '<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `${icons[type]}<div class="toast-message">${message}</div>`;
+
+            container.innerHTML = '';
+            container.appendChild(toast);
+
+            if (type !== 'loading') {
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => { dismissToast(); }, 3500);
+            }
+        }
+
+        function dismissToast() {
+            document.getElementById('toast-container').innerHTML = '';
+        }
+
+        // ════════════════════════════════════════════════════
+        //  Enter Key Bindings
+        // ════════════════════════════════════════════════════
+        document.getElementById('manual-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') manualConnect();
+        });
+        document.getElementById('manual-ssid').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') manualConnect();
+        });
     </script>
 </body>
+
 </html>
