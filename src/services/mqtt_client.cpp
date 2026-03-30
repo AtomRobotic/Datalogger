@@ -44,6 +44,37 @@ void mqtt_message_callback(String &topic, String &payload)
     xQueueSend(_mqtt_incoming_queue, &msg, 0);    
 }
 
+// Hàm hỗ trợ gom thông tin từ common.h và gửi lên topic info
+static void mqtt_publish_device_info(MQTTClient& mqtt_client) {
+    JsonDocument doc;
+    
+    // Gom các thông tin thiết bị từ common.h
+    doc["product_name"] = PRODUCT_NAME;
+    doc["product_model"] = PRODUCT_MODEL;
+    doc["firmware_version"] = FIRMWARE_VERSION;
+    doc["build_number"] = BUILD_NUMBER;
+    doc["device_id"] = _id;
+    doc["station_code"] = _station_code;
+    
+    String payload;
+    serializeJson(doc, payload);
+    
+    // Tạo topic info dựa trên topic data hiện tại
+    String info_topic = String(_mqtt_topic_pub);
+    
+    // Nếu topic data kết thúc bằng "/data", ta thay thế bằng "/info"
+    if (info_topic.endsWith("/data")) {
+        info_topic.replace("/data", "/info");
+    } else {
+        // Nếu không có chuẩn /data ở cuối, ta nối thêm _info vào cho an toàn
+        info_topic += "_info"; 
+    }
+    
+    // Đẩy gói JSON lên Broker
+    mqtt_client.publish(info_topic, payload);
+    APP_LOGI(TAG, "MQTT: Published device info to topic %s", info_topic.c_str());
+}
+
 void task_mqtt_client(void *pvParameters) {
     APP_LOGI(TAG, "MQTT Client Task started.");
     MQTTClient mqtt_client(512 * 6);
@@ -62,7 +93,7 @@ void task_mqtt_client(void *pvParameters) {
         
         if(strcmp(_mqtt_auth_method, "User/Pass") == 0)
         {
-            while(!mqtt_client.connect("2", _mqtt_username, _mqtt_password)) {
+            while(!mqtt_client.connect("_id", _mqtt_username, _mqtt_password)) {
                 APP_LOGW(TAG, "MQTT connection failed with user/pass, retrying in 5 seconds...");
                 APP_LOGW(TAG, "MQTT id: %s, username: %s, password: %s", _id, _mqtt_username, _mqtt_password);
                 vTaskDelay(pdMS_TO_TICKS(5000));
@@ -84,6 +115,14 @@ void task_mqtt_client(void *pvParameters) {
 
         APP_LOGI(TAG, "MQTT Connected!");
         xEventGroupSetBits(_normal_mode_event_group, MQTT_CONNECTED_BIT);
+
+        mqtt_publish_device_info(mqtt_client);
+        // -----------------------------------
+        
+        if(mqtt_client.subscribe(_mqtt_topic_sub))
+        {
+            APP_LOGI(TAG, "Subcribe topic %s successful", _mqtt_topic_sub);
+        }
         
         if(mqtt_client.subscribe(_mqtt_topic_sub))
         {
