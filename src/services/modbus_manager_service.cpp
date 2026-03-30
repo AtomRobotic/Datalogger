@@ -82,11 +82,38 @@ void modbus_manager_task(void *pvParameters)
 
         serializeJson(doc, mqtt_payload);
               
-        strncpy(mqtt_msg.topic, _mqtt_topic_pub, sizeof(mqtt_msg.topic) - 1);
-        strncpy(mqtt_msg.payload, mqtt_payload.c_str(), sizeof(mqtt_msg.payload) - 1);
+        //        // Cấp phát tĩnh trên Stack (Đảm bảo luôn có đủ RAM cho Modbus)
+        // strncpy(mqtt_msg.topic, _mqtt_topic_pub, sizeof(mqtt_msg.topic) - 1);
+        // strncpy(mqtt_msg.payload, mqtt_payload.c_str(), sizeof(mqtt_msg.payload) - 1);
 
-        xQueueSend(_mqtt_outgoing_queue, &mqtt_msg, 0);          
+        // xQueueSend(_mqtt_outgoing_queue, &mqtt_msg, 0); 
+
+
+
+        //         // Cấp phát động để truyền qua Queue
+        // mqtt_message_t *p_msg = (mqtt_message_t *)malloc(sizeof(mqtt_message_t));
+        // if (p_msg != NULL)
+        // {
+        //   strncpy(p_msg->topic, _mqtt_topic_pub, sizeof(p_msg->topic) - 1);
+        //   strncpy(p_msg->payload, mqtt_payload.c_str(), sizeof(p_msg->payload) - 1);
+        //   p_msg->topic[sizeof(p_msg->topic) - 1] = '\0';
+        //   p_msg->payload[sizeof(p_msg->payload) - 1] = '\0';
+
+        //   if (xQueueSend(_mqtt_outgoing_queue, &p_msg, 0) != pdPASS)
+        //   {
+        //     APP_LOGW(TAG, "Queue full, Modbus data dropped!");
+        //     free(p_msg); // Nếu Queue đầy thì phải giải phóng RAM ngay
+        //   }
+        // }
+        // else
+        // {
+        //   APP_LOGE(TAG, "Malloc failed in Modbus Task!");
+        // }
+        
+        // backup_manager_handle_data(mqtt_payload.c_str());
+         
         doc.clear();  
+        // warning_timeslot = 0; // Reset lại nếu đọc thành công
       }
       else
       {            

@@ -49,16 +49,26 @@
 #define VERSION_DEFAULT             1
 
 // wifi setting
-#define WIFI_SSID_DEFAULT           "BKIT_CS2"
+#define WIFI_SSID_DEFAULT           "BKIT_LUGIA_CS2"
 #define WIFI_PASSWORD_DEFAULT       "cselabc5c6"
 
 // mqtt default setting
 #define NTP_SERVER                  "pool.ntp.org"
-#define MQTT_HOST                   "mqtt.abcsolutions.com.vn"
-#define MQTT_USERNAME               "abcsolution"
-#define MQTT_PASSWORD               "CseLAbC5c6"
-#define MQTT_TOPIC_SUB              "young/inverterDatalogger/0001/config"
-#define MQTT_TOPIC_PUB              "young/inverterDatalogger/0001/data"
+
+// mqtt setting in server network
+#define MQTT_HOST                   "20.205.16.98"
+#define MQTT_USERNAME               "SolarInverterDatalogger"
+#define MQTT_PASSWORD               "12345678"
+#define MQTT_TOPIC_SUB              "inverter/001/config"
+#define MQTT_TOPIC_PUB              "inverter/001/data"
+
+// #define MQTT_HOST in server network                   "
+// #define MQTT_HOST                   "192.168.1.254"
+// #define MQTT_USERNAME               "DataLoggerInverter"
+// #define MQTT_PASSWORD               "cselabc5c6"
+// #define MQTT_TOPIC_SUB              "young/inverterDatalogger/0001/config"
+// #define MQTT_TOPIC_PUB              "young/inverterDatalogger/0001/data"
+
 #define MQTT_TOKEN                  ""
 #define MQTT_AUTH_METHOD            "User/Pass"
 #define MQTT_PORT                   1883
@@ -73,6 +83,12 @@
 #define MQTT_CONNECTED_BIT          (1 << 1)
 #define DATA_FROM_SENSOR_BIT        (1 << 2)
 #define NTP_SYNCED_BIT              (1 << 3)
+
+// SD card setting
+// #define SCK                         18
+// #define MISO                        19     
+// #define MOSI                        23
+// #define SD_CS_PIN                   5
 
 /* Struct --------------------------------------------------------------------*/
 typedef enum 

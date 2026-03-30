@@ -3,6 +3,7 @@
 #include "app_log.h"
 #include "app_assert.h"
 #include "hal/ntp_time.h"
+#include "hal/rtc.h"
 
 /* Define --------------------------------------------------------------------*/
 

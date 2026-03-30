@@ -86,7 +86,7 @@ void init_system_supervisor(void)
 
     delay(100);
 
-    _mqtt_outgoing_queue = xQueueCreate(5, sizeof(mqtt_message_t));
+    _mqtt_outgoing_queue = xQueueCreate(10, sizeof(mqtt_message_t*));
     ASSERT_BOOL(_mqtt_outgoing_queue != NULL, TAG, "Create outgoing queue failed.");
 
     delay(100);
@@ -117,6 +117,9 @@ void init_system_supervisor(void)
     delay(100);
 
     init_input_processing();
+
+    vTaskDelay(100);
+    // init_backup_manager();         
 
     delay(100);
 
@@ -251,7 +254,13 @@ void task_system_supervisor(void *pvParameters)
                 
                 
             }
-            else 
+            else if (evt.command == CMD_CONFIG_UPDATED_RELOAD || evt.command == CMD_SWITCH_TO_NORMAL_MODE)
+            {
+                APP_LOGI(TAG, "Configuration updated or Mode changed. REBOOTING SYSTEM...");
+                vTaskDelay(pdMS_TO_TICKS(1000)); // Đợi log in ra hết
+                esp_restart(); // Reset phần cứng, an toàn 100%, tự load EEPROM mới cấu hình
+            }
+            else
             {
                 APP_LOGW(TAG, "Unknown command received: %d", evt.command);
             }

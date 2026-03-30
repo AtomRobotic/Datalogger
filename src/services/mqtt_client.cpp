@@ -60,7 +60,7 @@ void task_mqtt_client(void *pvParameters) {
         APP_LOGW(TAG, "MQTT host: %s, port: %d", _mqtt_host, _mqtt_port);
         mqtt_client.onMessage(mqtt_message_callback);        
         
-        if(strcmp(_mqtt_auth_method, "user_pass") == 0)
+        if(strcmp(_mqtt_auth_method, "User/Pass") == 0)
         {
             while(!mqtt_client.connect("2", _mqtt_username, _mqtt_password)) {
                 APP_LOGW(TAG, "MQTT connection failed with user/pass, retrying in 5 seconds...");
@@ -99,10 +99,13 @@ void task_mqtt_client(void *pvParameters) {
         while(mqtt_client.connected()) {
             mqtt_client.loop(); 
             
-            mqtt_message_t data_to_send;
+            mqtt_message_t *data_to_send;
             if (xQueueReceive(_mqtt_outgoing_queue, &data_to_send, 0) == pdPASS) {
-                mqtt_client.publish(data_to_send.topic, data_to_send.payload);
-                APP_LOGI(TAG, "MQTT: Published data to topic %s", data_to_send.topic);
+                mqtt_client.publish(data_to_send->topic, data_to_send->payload);
+                APP_LOGI(TAG, "MQTT: Published data to topic %s", data_to_send->topic);
+                
+                // BẮT BUỘC PHẢI CÓ DÒNG NÀY ĐỂ TRÁNH TRÀN RAM (Memory Leak)
+                free(data_to_send); 
             }
             
             mqtt_message_t data_receive;

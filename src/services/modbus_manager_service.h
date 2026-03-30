@@ -7,6 +7,7 @@
 #include "app_assert.h"
 #include "led.h"
 #include "ntp_sync_time.h"
+#include "backup_data.h"
 
 /* Define --------------------------------------------------------------------*/
 #define SLAVE_ID            1

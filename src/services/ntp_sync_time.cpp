@@ -31,7 +31,7 @@ void ntp_sync_time_task(void *pvParameters)
 {
     bool isFirstSync = true;
     const TickType_t xRetryInterval = pdMS_TO_TICKS(5000);
-    const TickType_t xLongDelay = pdMS_TO_TICKS(1 * 60 * 60 * 1000); 
+    const TickType_t xLongDelay = pdMS_TO_TICKS(24 * 60 * 60 * 1000); 
 
     APP_LOGI(TAG, "NTP Sync Task started.");
 
@@ -57,16 +57,27 @@ void ntp_sync_time_task(void *pvParameters)
         vTaskDelay(5000);
 
         
-        if (ntp_update_time()) {
-            APP_LOGI(TAG, "NTP: Time synced successfully: %s", ntp_time_get_buffer());
+        // Gọi thư viện NTP và kiểm tra lấy giờ thành công
+        if (ntp_update_time()) { 
+            // 1. Lấy giờ chuẩn (Epoch time) từ thư viện NTPClient
+            // (time_client đã được khai báo ở common.h/system_events)
+            uint32_t current_epoch = time_client.getEpochTime();
+
+            // 2. GHI XUỐNG RTC PHẦN CỨNG
+            rtc_set_time_epoch(current_epoch);
+            
+            // 3. Đọc ngược lại RTC để kiểm tra
+            char rtc_check[32];
+            rtc_get_time_buffer(rtc_check, sizeof(rtc_check));
+            APP_LOGI(TAG, "NTP: Server time saved to RTC: %s", rtc_check);
             
             if (isFirstSync) {
                 xEventGroupSetBits(_normal_mode_event_group, NTP_SYNCED_BIT);
                 isFirstSync = false;
             }
 
-            
-            vTaskDelay(xLongDelay);
+            vTaskDelete(NULL); // Tự xóa Task sau khi đồng bộ thành công
+            // vTaskDelay(xLongDelay);
 
         } else {
             APP_LOGW(TAG, "NTP: Failed to sync time. Retrying in 15 seconds...");

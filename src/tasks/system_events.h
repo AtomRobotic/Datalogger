@@ -12,6 +12,9 @@
 #include "modbus_manager_service.h"
 #include "led.h"
 #include "ntp_sync_time.h"
+#include "backup_data.h"
+#include "sd_card.h"
+#include "rtc.h"   
 
 /* Define --------------------------------------------------------------------*/
 
