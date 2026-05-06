@@ -38,9 +38,9 @@
 
 // information
 #define PRODUCT_NAME                "Inverter Datalogger"
-#define PRODUCT_MODEL               "ID.00.00.01"
-#define FIRMWARE_VERSION            "1"
-#define BUILD_NUMBER                "ID202405.0001"
+#define PRODUCT_MODEL               "DATALOGER260303L REV. 003"
+#define FIRMWARE_VERSION            "1.2.2"
+#define BUILD_NUMBER                "20260727.012"
 
 // device setting
 #define STATION_CODE                "ID"
@@ -56,7 +56,7 @@
 #define NTP_SERVER                  "pool.ntp.org"
 
 // mqtt setting in server network
-#define MQTT_HOST                   "20.205.16.98"
+#define MQTT_HOST                   "20.17.162.135"
 #define MQTT_USERNAME               "SolarInverterDatalogger"
 #define MQTT_PASSWORD               "12345678"
 #define MQTT_TOPIC_SUB              "inverter/001/config"

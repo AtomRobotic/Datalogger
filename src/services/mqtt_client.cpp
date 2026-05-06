@@ -47,13 +47,14 @@ void mqtt_message_callback(String &topic, String &payload)
 // Hàm hỗ trợ gom thông tin từ common.h và gửi lên topic info
 static void mqtt_publish_device_info(MQTTClient& mqtt_client) {
     JsonDocument doc;
-    
+
+    doc["manufacture"]  = "ABCSolutions";
     doc["product_name"] = PRODUCT_NAME;
     doc["product_model"] = PRODUCT_MODEL;
     doc["firmware_version"] = FIRMWARE_VERSION;
     doc["build_number"] = BUILD_NUMBER;
     doc["device_id"] = _id;
-    doc["station_code"] = _station_code;
+    // doc["station_code"] = _station_code;
     
     String payload;
     serializeJson(doc, payload);
@@ -115,10 +116,11 @@ void task_mqtt_client(void *pvParameters) {
         APP_LOGI(TAG, "MQTT Connected!");
         xEventGroupSetBits(_normal_mode_event_group, MQTT_CONNECTED_BIT);
 
+        // --- Gửi thông tin thiết bị lên server ngay sau khi kết nối thành công ---
         mqtt_publish_device_info(mqtt_client);
-        // -----------------------------------
         
-        if (strlen(_mqtt_topic_sub) > 0) {
+        if(mqtt_client.subscribe(_mqtt_topic_sub) > 0)
+        {
             // NẾU CÓ NHẬP TOPIC THÌ MỚI SUBSCRIBE
             if(mqtt_client.subscribe(_mqtt_topic_sub))
             {
@@ -128,7 +130,9 @@ void task_mqtt_client(void *pvParameters) {
             {
                 APP_LOGW(TAG, "Subcribe topic %s failed.", _mqtt_topic_sub);
             }
-        } else {
+        }
+        else
+        {
             // NẾU BỎ TRỐNG THÌ BỎ QUA (KHÔNG ĐƯỢC CÓ LỆNH SUBSCRIBE NÀO NỮA KHỎI ĐÂY)
             APP_LOGI(TAG, "No subscribe topic configured. Skipping subscribe.");
         }
