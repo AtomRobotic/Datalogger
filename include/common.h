@@ -145,7 +145,7 @@ typedef enum {
 
 // Cấu trúc dữ liệu cho từng loại sự kiện
 typedef struct {
-    char param1[256];
+    char param1[512];
     char param2[256];
 } http_request_data_t;
 

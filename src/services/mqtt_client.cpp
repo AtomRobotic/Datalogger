@@ -91,7 +91,7 @@ void task_mqtt_client(void *pvParameters) {
         APP_LOGW(TAG, "MQTT host: %s, port: %d", _mqtt_host, _mqtt_port);
         mqtt_client.onMessage(mqtt_message_callback);        
         
-        if(strcmp(_mqtt_auth_method, "User/Pass") == 0)
+        if(strcmp(_mqtt_auth_method, "userpass") == 0 || strcmp(_mqtt_auth_method, "User/Pass") == 0)
         {
             while(!mqtt_client.connect("_id", _mqtt_username, _mqtt_password)) {
                 APP_LOGW(TAG, "MQTT connection failed with user/pass, retrying in 5 seconds...");
@@ -119,9 +119,8 @@ void task_mqtt_client(void *pvParameters) {
         // --- Gửi thông tin thiết bị lên server ngay sau khi kết nối thành công ---
         mqtt_publish_device_info(mqtt_client);
         
-        if(mqtt_client.subscribe(_mqtt_topic_sub) > 0)
+        if(strlen(_mqtt_topic_sub) > 0)
         {
-            // NẾU CÓ NHẬP TOPIC THÌ MỚI SUBSCRIBE
             if(mqtt_client.subscribe(_mqtt_topic_sub))
             {
                 APP_LOGI(TAG, "Subcribe topic %s successful", _mqtt_topic_sub);
@@ -133,7 +132,7 @@ void task_mqtt_client(void *pvParameters) {
         }
         else
         {
-            // NẾU BỎ TRỐNG THÌ BỎ QUA (KHÔNG ĐƯỢC CÓ LỆNH SUBSCRIBE NÀO NỮA KHỎI ĐÂY)
+            // Kiểm tra độ dài = 0 thì bỏ qua luôn, TUYỆT ĐỐI KHÔNG GỌI lệnh subscribe
             APP_LOGI(TAG, "No subscribe topic configured. Skipping subscribe.");
         }
 

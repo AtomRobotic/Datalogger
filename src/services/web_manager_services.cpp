@@ -302,12 +302,17 @@ void task_event_handler(void *pvParameters)
                                                 
                         APP_LOGI(TAG, "Server mode: advanced, Host: %s, Topic: %s", server_host, topic);
                         
+                        const char* topic_sub = doc["topic_sub"];
+                        if (topic_sub) {
+                            strcpy(_mqtt_topic_sub, topic_sub);
+                        }
+
                         if (strcmp(authMethod, "token") == 0) {
                             const char* token = doc["token"];                            
                             strcpy(_mqtt_token, token);                        
                             APP_LOGI(TAG, "Auth method: Token, Token: %s", token);
                         } 
-                        else if (strcmp(authMethod, "user_pass") == 0) {
+                        else if (strcmp(authMethod, "userpass") == 0) {
                             const char* username = doc["username"];
                             const char* password_mqtt = doc["password_mqtt"];
                             
