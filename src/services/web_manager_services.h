@@ -5,6 +5,7 @@
 #include "common.h"
 #include "memory_config.h"
 #include "services/mqtt_client.h"
+#include "led.h"
 #include <LittleFS.h>
 
 /* Define --------------------------------------------------------------------*/

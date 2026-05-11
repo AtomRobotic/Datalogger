@@ -3,3 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+# Bỏ qua các file khóa bảo mật và mã băm
+scripts/*.pem
+scripts/*.bin

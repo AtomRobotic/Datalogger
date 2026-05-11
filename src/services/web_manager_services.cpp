@@ -45,6 +45,8 @@ void start_ap_mode()
 {
     APP_LOGI(TAG, "Ap mode started.");    
 
+    set_system_led_state(STATE_AP_CONFIG);
+
     s_sensor_data_mutex = xSemaphoreCreateMutex();
     ASSERT_BOOL(s_sensor_data_mutex != NULL, TAG, "Failed to create sensor data mutex");    
 
@@ -63,13 +65,12 @@ void start_ap_mode()
     // ASSERT_BOOL(WiFi.disconnect(), TAG, "Failed to disconnect WiFi");
     // ASSERT_BOOL(WiFi.mode(WIFI_OFF), TAG, "Failed to turn off WiFi");
 
-    snprintf(_ap_ssid, sizeof(_ap_ssid), "ABC_IDH_INVERTER_DATALOGGER_%s", _id);
+    // snprintf(_ap_ssid, sizeof(_ap_ssid), "ABC_IDH_INVERTER_DATALOGGER_%s", _id);
     sprintf(s_ap_ssid_temp, "%s %s", DEVICE_NAME, _id);
 
     ASSERT_BOOL(WiFi.mode(WIFI_AP_STA), TAG, "Failed to set WiFi to AP+STA mode");
     ASSERT_BOOL(WiFi.softAP(_ap_ssid, _ap_password), TAG, "Failed to start softAP");
 
-    APP_LOGI(TAG, "AP Started");
     APP_LOGI(TAG, "AP SSID: %s", _ap_ssid);
     APP_LOGI(TAG, "AP Password: %s", _ap_password);
 

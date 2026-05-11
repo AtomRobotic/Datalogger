@@ -24,7 +24,7 @@
 void pre_transmission();
 void post_transmission();
 bool read_registers(uint16_t start_address, uint16_t* data, uint16_t quantity, const char* label, bool& success_flag);
-bool read_and_store_data(JsonDocument& doc);
+bool read_and_store_data(JsonDocument& doc, bool is_first);
 
 void modbus_manager_task(void *pvParameters);
 void init_modbus_manager(void);

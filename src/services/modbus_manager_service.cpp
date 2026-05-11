@@ -49,76 +49,96 @@ void modbus_manager_task(void *pvParameters)
   const TickType_t period = READ_INTERVAL_MS; 
   static uint32_t warning_timeslot = 0;         
 
+  // --- THÊM BIẾN ĐẾM CHO TÍNH TOÁN TRUNG BÌNH ---
+  int cycle_count = 0;
+  int success_count = 0;
+  // Tính số lần đọc cần thiết để đạt 30 giây (Ví dụ: 30000ms / 5000ms = 6 lần)
+  const int TARGET_CYCLES = 30000 / READ_INTERVAL_MS; 
+
   for(;;)
   {    
     APP_LOGI(TAG, "Wait for connecting to broker...");
     xEventGroupWaitBits(_normal_mode_event_group, MQTT_CONNECTED_BIT, pdFALSE, pdTRUE, portMAX_DELAY);      
-    APP_LOGI(TAG, "Broker connected and start reading data");
-    led_a_on(); 
+    APP_LOGI(TAG, "Broker connected and start reading data"); 
     vTaskDelay(500);
     APP_LOGI(TAG, "Wait for connecting sync time from server");
     xEventGroupWaitBits(_normal_mode_event_group, NTP_SYNCED_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-    led_b_on();
+    // led_b_on();
     vTaskDelay(500);
-    all_led_off();              
+    // all_led_off();              
 
     while (MQTT_CONNECTED_BIT)
     {
-      APP_LOGI(TAG, "Get data from inverter and send to MQTT broker...");      
-      bool success = read_and_store_data(doc);      
-
-      char formatted_date_time[25];
-      strncpy(formatted_date_time, ntp_time_get_buffer(), sizeof(formatted_date_time));
-      formatted_date_time[sizeof(formatted_date_time) - 1] = '\0';
-
-      APP_LOGI(TAG, "TIMESTAMP: %s", formatted_date_time);
+      cycle_count++;
+      APP_LOGI(TAG, "Reading data from inverter... (Cycle %d/%d)", cycle_count, TARGET_CYCLES);      
+      
+      // Nếu là lần đọc thành công đầu tiên trong chu kỳ 30s, is_first = true để khởi tạo doc
+      bool is_first = (success_count == 0);
+      bool success = read_and_store_data(doc, is_first);      
 
       if(success)
       { 
-        char formatted_date_time[25];
-        strncpy(formatted_date_time, ntp_time_get_buffer(), sizeof(formatted_date_time));
-        formatted_date_time[sizeof(formatted_date_time) - 1] = '\0';
-        doc["timestamp"] = formatted_date_time;        
-
-        serializeJson(doc, mqtt_payload);
-              
-        //        // Cấp phát tĩnh trên Stack (Đảm bảo luôn có đủ RAM cho Modbus)
-        // strncpy(mqtt_msg.topic, _mqtt_topic_pub, sizeof(mqtt_msg.topic) - 1);
-        // strncpy(mqtt_msg.payload, mqtt_payload.c_str(), sizeof(mqtt_msg.payload) - 1);
-
-        // xQueueSend(_mqtt_outgoing_queue, &mqtt_msg, 0); 
-
-
-
-        //         // Cấp phát động để truyền qua Queue
-        // mqtt_message_t *p_msg = (mqtt_message_t *)malloc(sizeof(mqtt_message_t));
-        // if (p_msg != NULL)
-        // {
-        //   strncpy(p_msg->topic, _mqtt_topic_pub, sizeof(p_msg->topic) - 1);
-        //   strncpy(p_msg->payload, mqtt_payload.c_str(), sizeof(p_msg->payload) - 1);
-        //   p_msg->topic[sizeof(p_msg->topic) - 1] = '\0';
-        //   p_msg->payload[sizeof(p_msg->payload) - 1] = '\0';
-
-        //   if (xQueueSend(_mqtt_outgoing_queue, &p_msg, 0) != pdPASS)
-        //   {
-        //     APP_LOGW(TAG, "Queue full, Modbus data dropped!");
-        //     free(p_msg); // Nếu Queue đầy thì phải giải phóng RAM ngay
-        //   }
-        // }
-        // else
-        // {
-        //   APP_LOGE(TAG, "Malloc failed in Modbus Task!");
-        // }
-        
-        backup_manager_handle_data(mqtt_payload.c_str());
-         
-        doc.clear();  
-        // warning_timeslot = 0; // Reset lại nếu đọc thành công
+        success_count++; // Tăng biến đếm số lần đọc thành công
+        warning_timeslot = 0; 
+        EventBits_t bits = xEventGroupGetBits(_normal_mode_event_group);
+        if ((bits & MQTT_CONNECTED_BIT) != 0) 
+        {
+            // Nếu có cờ mạng -> Hệ thống hoàn hảo
+            set_system_led_state(STATE_NORMAL); 
+        } 
+        else 
+        {
+            // Nếu mất cờ mạng -> Lỗi Server nhưng Modbus vẫn chạy
+            set_system_led_state(STATE_ERROR2); 
+        }
       }
       else
       {            
+        set_system_led_state(STATE_ERROR1);
         warning_timeslot++;
         APP_LOGW(TAG, "%d time: Sensor doesn't response in this timeslot.", warning_timeslot);
+      }
+
+      // --- KIỂM TRA ĐÃ ĐỦ 30 GIÂY CHƯA ---
+      if (cycle_count >= TARGET_CYCLES) 
+      {
+        if (success_count > 0) 
+        {
+          APP_LOGI(TAG, "30s elapsed. Calculating average and sending data...");
+          
+          // 1. Chia trung bình tất cả các giá trị đã cộng dồn trong doc
+          for (JsonPair kv : doc.as<JsonObject>()) {
+              if (kv.value().is<JsonObject>()) {
+                  JsonObject obj = kv.value().as<JsonObject>();
+                  if (!obj["value"].isNull()) {
+                      float sum = obj["value"].as<float>();
+                      obj["value"] = sum / success_count; // Chia cho số lần đọc THÀNH CÔNG thực tế
+                  }
+              }
+          }
+
+          // 2. Gắn Timestamp tại thời điểm gửi đi
+          char formatted_date_time[25];
+          strncpy(formatted_date_time, ntp_time_get_buffer(), sizeof(formatted_date_time));
+          formatted_date_time[sizeof(formatted_date_time) - 1] = '\0';
+          doc["timestamp"] = formatted_date_time;        
+          APP_LOGI(TAG, "TIMESTAMP: %s", formatted_date_time);
+
+          // 3. Đóng gói và đẩy dữ liệu
+          serializeJson(doc, mqtt_payload);
+          backup_manager_handle_data(mqtt_payload.c_str());
+          
+          // 4. Xóa bộ đệm JSON chuẩn bị cho chu kỳ 30s tiếp theo
+          doc.clear();  
+        }
+        else 
+        {
+          APP_LOGW(TAG, "All reads in 30s failed. Nothing to send.");
+        }
+        
+        // Reset lại biến đếm chu kỳ
+        cycle_count = 0;
+        success_count = 0;
       }
 
       if(warning_timeslot == ERROR_THRESHOLD)
@@ -128,21 +148,16 @@ void modbus_manager_task(void *pvParameters)
       }
 
       vTaskDelayUntil(&xLastWakeTime, period);    
-      
     }
 
     APP_LOGI(TAG, "MQTT Broker disconnect, start reconnecting...");
-
-
+    set_system_led_state(STATE_ERROR2);
     vTaskDelay(pdMS_TO_TICKS(15000));            
   }
 
   APP_LOGI(TAG, "Self deleting, check the data connection and restart system.");
-
   _modbus_manager_handler_t = NULL;
-
   vTaskDelete(NULL);
-
 }
 
 void pre_transmission()
@@ -160,11 +175,11 @@ void post_transmission()
 bool read_registers(uint16_t start_address, uint16_t* data, uint16_t quantity, const char* label, bool& success_flag)
 {    
   uint8_t result = s_modbus_node.readHoldingRegisters(start_address, quantity);
-  led_a_toggle();
+  // led_a_toggle();
   APP_LOGI(TAG, "Error code: %0X", result);    
   if (result == s_modbus_node.ku8MBSuccess)
   {
-    led_b_toggle();
+    // led_b_toggle();
     for (uint16_t i = 0; i < quantity; i++)
     {
       data[i] = s_modbus_node.getResponseBuffer(i);
@@ -179,14 +194,13 @@ bool read_registers(uint16_t start_address, uint16_t* data, uint16_t quantity, c
   }
 }
 
-bool read_and_store_data(JsonDocument& doc)
+bool read_and_store_data(JsonDocument& doc, bool is_first)
 {
   uint16_t data[64];
   bool     ok;
   bool     hasError = false;
 
-  struct ReadInfo
-  {
+  struct ReadInfo {
     int         offset;
     int         size;
     const char* label;
@@ -195,11 +209,17 @@ bool read_and_store_data(JsonDocument& doc)
       {100 + 31 * 5, 40, "BatteryLoadInverter"}, {100 + 31 * 6, 32, "PVPowerBattery"},
   };
 
+  // Lambda nâng cấp: Nếu is_first thì gán đè, nếu không thì CỘNG DỒN
   auto set = [&](const char* key, const char* name, const char* unit, float value)
   {
-    doc[key]["value"] = value;
-    doc[key]["name"]  = name;
-    doc[key]["unit"]  = unit;
+    if (is_first) {
+      doc[key]["value"] = value;
+      doc[key]["name"]  = name;
+      doc[key]["unit"]  = unit;
+    } else {
+      float current_val = doc[key]["value"].as<float>();
+      doc[key]["value"] = current_val + value; // Cộng dồn giá trị
+    }
   };
 
   for (const auto& r : reads)
@@ -213,7 +233,6 @@ bool read_and_store_data(JsonDocument& doc)
         set("gridBuyToday_kWh", "Grid Buy Today", "kWh", data[14] / 10.0);
         set("gridBuyTotal_kWh", "Grid Buy Total", "kWh", data[16] / 10.0);
         set("gridFreq", "Grid Frequency", "Hz", data[17] / 100.0);
-
         set("loadToday", "Load Today", "kWh", data[22] / 10.0);
         set("totalLoad", "Total Load", "kWh", data[23] / 10.0);
       }
@@ -237,8 +256,9 @@ bool read_and_store_data(JsonDocument& doc)
         set("gridL1", "Grid L1", "V", data[28] / 10.0);
         set("gridL2", "Grid L2", "V", data[29] / 10.0);
 
-        float gridPower = doc["gridCT1"]["value"].as<float>() + doc["gridCT2"]["value"].as<float>();
-        set("gridPower", "Grid Power", "W", gridPower);
+        // Lấy giá trị data thô hiện tại để tính toán, tránh lỗi cộng dồn kép
+        float current_gridPower = (int16_t)data[13] + (int16_t)data[11];
+        set("gridPower", "Grid Power", "W", current_gridPower);
       }
       else if (strcmp(r.label, "BatteryLoadInverter") == 0)
       {
@@ -251,21 +271,27 @@ bool read_and_store_data(JsonDocument& doc)
         set("loadL2", "Load Phase 2 Voltage", "V", data[3] / 10.0);
         set("loadP2", "Load Phase 2 Power", "W", (int16_t)data[22]);
 
-        float loadPower = doc["loadP1"]["value"].as<float>() + doc["loadP2"]["value"].as<float>();
-        set("loadPower", "Total Load Power", "W", loadPower);
+        float current_loadPower = (int16_t)data[21] + (int16_t)data[22];
+        set("loadPower", "Total Load Power", "W", current_loadPower);
+
+        // Xử lý điều kiện riêng cho Inverter L2 Voltage
+        float current_invL2_V = data[2] / 10.0;
+        float current_invI2 = data[10] / 100.0;
+        float current_invP2 = (int16_t)data[19];
+        
+        if (current_invI2 == 0 && current_invP2 == 0) {
+            current_invL2_V = 0;
+        }
 
         set("inverterL1_V", "Inverter L1 Voltage", "V", data[1] / 10.0);
         set("inverterI1", "Inverter L1 Current", "A", data[9] / 100.0);
         set("inverterINV_P1", "Inverter L1 Power", "W", (int16_t)data[18]);
-        set("inverterL2_V", "Inverter L2 Voltage", "V", data[2] / 10.0);
-        set("inverterI2", "Inverter L2 Current", "A", data[10] / 100.0);
-        set("inverterINV_P2", "Inverter L2 Power", "W", (int16_t)data[19]);
+        set("inverterL2_V", "Inverter L2 Voltage", "V", current_invL2_V);
+        set("inverterI2", "Inverter L2 Current", "A", current_invI2);
+        set("inverterINV_P2", "Inverter L2 Power", "W", current_invP2);
 
-        if (doc["inverterI2"]["value"].as<float>() == 0 && doc["inverterINV_P2"]["value"].as<float>() == 0)
-          doc["inverterL2_V"]["value"] = 0;
-
-        float inverterPower = doc["inverterINV_P1"]["value"].as<float>() + doc["inverterINV_P2"]["value"].as<float>();
-        set("inverterPower", "Inverter Power", "W", inverterPower);
+        float current_inverterPower = (int16_t)data[18] + (int16_t)data[19];
+        set("inverterPower", "Inverter Power", "W", current_inverterPower);
         set("inverterFreq", "Inverter Frequency", "Hz", data[37] / 100.0);
       }
       else if (strcmp(r.label, "PVPowerBattery") == 0)
@@ -274,8 +300,8 @@ bool read_and_store_data(JsonDocument& doc)
         set("pv2Power", "PV2 Power", "W", (int16_t)data[1]);
         set("pv3Power", "PV3 Power", "W", (int16_t)data[2]);
 
-        float solarPower = doc["pv1Power"]["value"].as<float>() + doc["pv2Power"]["value"].as<float>() + doc["pv3Power"]["value"].as<float>();
-        set("solarPower", "Total Solar Power", "W", solarPower);
+        float current_solarPower = (int16_t)data[0] + (int16_t)data[1] + (int16_t)data[2];
+        set("solarPower", "Total Solar Power", "W", current_solarPower);
 
         set("batteryCurrent", "Battery Current", "A", (int16_t)data[5] / 100.0);
         set("batteryPower", "Battery Power", "W", (int16_t)data[4]);
@@ -286,7 +312,6 @@ bool read_and_store_data(JsonDocument& doc)
       hasError = true;
     }
   }
-
   return !hasError;
 }
 

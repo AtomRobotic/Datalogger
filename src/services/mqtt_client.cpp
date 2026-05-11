@@ -48,7 +48,7 @@ void mqtt_message_callback(String &topic, String &payload)
 static void mqtt_publish_device_info(MQTTClient& mqtt_client) {
     JsonDocument doc;
 
-    doc["manufacture"]  = "ABCSolutions";
+    doc["manufacturer_name"]  = "ABCSolutions";
     doc["product_name"] = PRODUCT_NAME;
     doc["product_model"] = PRODUCT_MODEL;
     doc["firmware_version"] = FIRMWARE_VERSION;

@@ -141,7 +141,7 @@ void task_system_supervisor(void *pvParameters)
 
     for(;;)
     {
-        if (xQueueReceive(_system_cmd_queue, &evt, portMAX_DELAY) == pdPASS) 
+        if (xQueueReceive(_system_cmd_queue, &evt, pdMS_TO_TICKS(10000)) == pdPASS) 
         {
             APP_LOGI(TAG, "Received command, start processing.");
             if (evt.command == CMD_SWITCH_TO_NORMAL_MODE && _system_current_state == STATE_AP_MODE) 
@@ -263,6 +263,14 @@ void task_system_supervisor(void *pvParameters)
             else
             {
                 APP_LOGW(TAG, "Unknown command received: %d", evt.command);
+            }
+        }
+        else
+        {
+            if (_system_current_state == STATE_NORMAL_MODE) {
+                uint32_t free_heap = ESP.getFreeHeap();
+                APP_LOGI(TAG, "--- MEMORY PROFILE ---");
+                APP_LOGI(TAG, "Free Heap: %u bytes", free_heap);
             }
         }
        

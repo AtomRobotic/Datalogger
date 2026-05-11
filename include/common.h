@@ -49,32 +49,24 @@
 #define VERSION_DEFAULT             1
 
 // wifi setting
-#define WIFI_SSID_DEFAULT           "BKIT_LUGIA_CS2"
-#define WIFI_PASSWORD_DEFAULT       "cselabc5c6"
+#define WIFI_SSID_DEFAULT           "----"
+#define WIFI_PASSWORD_DEFAULT       "----"
 
 // mqtt default setting
 #define NTP_SERVER                  "pool.ntp.org"
 
 // mqtt setting in server network
-#define MQTT_HOST                   "20.17.162.135"
+#define MQTT_HOST                   "115.73.209.204"
 #define MQTT_USERNAME               "SolarInverterDatalogger"
 #define MQTT_PASSWORD               "12345678"
 #define MQTT_TOPIC_SUB              "inverter/001/config"
 #define MQTT_TOPIC_PUB              "inverter/001/data"
-
-// #define MQTT_HOST in server network                   "
-// #define MQTT_HOST                   "192.168.1.254"
-// #define MQTT_USERNAME               "DataLoggerInverter"
-// #define MQTT_PASSWORD               "cselabc5c6"
-// #define MQTT_TOPIC_SUB              "young/inverterDatalogger/0001/config"
-// #define MQTT_TOPIC_PUB              "young/inverterDatalogger/0001/data"
-
 #define MQTT_TOKEN                  ""
 #define MQTT_AUTH_METHOD            "User/Pass"
-#define MQTT_PORT                   1883
+#define MQTT_PORT                   1884
 
 // ap setting
-#define AP_SSID_DEFAULT             "AP-ESP32"
+#define AP_SSID_DEFAULT             "Inverter_Datalogger_0001"
 #define AP_PASSWORD_DEFAULT         "12345678"
 #define AP_ADMIN_USERNAME           "admin"
 #define AP_ADMIN_PASSWORD           "adminisme"
