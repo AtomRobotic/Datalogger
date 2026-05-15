@@ -772,6 +772,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="form-label">Port</label>
+                            <input type="number" class="form-input" id="port" placeholder="e.g. 1883" value="1883">
+                        </div>
+
+                        <div class="form-group">
                             <label class="form-label">Publish Topic</label>
                             <input type="text" class="form-input" id="topic" placeholder="e.g. device/data">
                         </div>
@@ -924,7 +929,7 @@
             </div>
 
             <!-- ══════════════ OTA Page ══════════════ -->
-            
+
 
         </div><!-- /main-content -->
 
@@ -1034,13 +1039,13 @@
             });
         }
 
-        function goToOTA() { 
-        // Chuyển hướng trình duyệt sang trang OTA mặc định của ESP32
-        window.location.href = '/update'; 
-        
-        // Hoặc nếu bạn muốn mở OTA ở một tab mới thì dùng lệnh dưới đây thay thế:
-        // window.open('/update', '_blank');
-    }
+        function goToOTA() {
+            // Chuyển hướng trình duyệt sang trang OTA mặc định của ESP32
+            window.location.href = '/update';
+
+            // Hoặc nếu bạn muốn mở OTA ở một tab mới thì dùng lệnh dưới đây thay thế:
+            // window.open('/update', '_blank');
+        }
 
         // ════════════════════════════════════════════════════
         //  WiFi – Update Credentials
@@ -1148,10 +1153,11 @@
 
             if (mode === 'advanced') {
                 payload.server = document.getElementById('hostname').value;
+                payload.port = parseInt(document.getElementById('port').value, 10);
                 payload.topic = document.getElementById('topic').value;
 
-                if (!payload.server || !payload.topic) {
-                    return showToast('error', 'Hostname and Publish Topic are required!');
+                if (!payload.server || !payload.port || !payload.topic) {
+                    return showToast('error', 'Hostname, Port and Publish Topic are required!');
                 }
 
                 // Gộp mảng các topic thành 1 chuỗi cách nhau bằng dấu phẩy
@@ -1194,7 +1200,7 @@
         }
 
 
-        
+
         // ════════════════════════════════════════════════════
         //  Finish Configuration -> Normal Mode
         // ════════════════════════════════════════════════════

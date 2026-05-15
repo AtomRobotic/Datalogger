@@ -294,14 +294,17 @@ void task_event_handler(void *pvParameters)
                     } 
                     else if (strcmp(mode, "advanced") == 0) {
                         const char* server_host = doc["server"];
+                        uint32_t server_port = doc["port"] | 1883;
                         const char* topic = doc["topic"];
                         const char* authMethod = doc["authMethod"];
 
                         strcpy(_mqtt_auth_method, authMethod);
                         strcpy(_mqtt_topic_pub, topic);
                         strcpy(_mqtt_host, server_host);
-                                                
-                        APP_LOGI(TAG, "Server mode: advanced, Host: %s, Topic: %s", server_host, topic);
+                        
+                        _mqtt_port = server_port;
+
+                        APP_LOGI(TAG, "Server mode: advanced, Host: %s, Port: %d, Topic: %s", server_host, _mqtt_port, topic);
                         
                         const char* topic_sub = doc["topic_sub"];
                         if (topic_sub) {

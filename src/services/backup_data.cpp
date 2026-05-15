@@ -5,6 +5,7 @@
 #define BACKUP_DIR "/backup"
 #define MAX_BACKUP_FILE_SIZE (20 * 1024) // Tối đa 20KB mỗi file (chia nhỏ để dễ quản lý)
 #define CHECK_INTERVAL_MS 10000          // 10 giây kiểm tra thư mục backup một lần
+#define MAX_SYNC_RECORDS_PER_CYCLE 15   // Số bản ghi tối đa gửi đi mỗi lần đồng bộ để tránh tràn RAM
 
 static const char *TAG = "BACKUP_MGR";
 static String current_backup_file = "";
@@ -216,9 +217,17 @@ void task_backup_recovery(void *pvParameters)
             bool file_fully_processed = true;
             size_t processed_bytes = 0;
 
+            int records_sent_this_cycle = 0;
+            
             // 4. Đọc từng dòng của File
             while (entry.available()) {
                 vTaskDelay(pdMS_TO_TICKS(10)); // Nhường CPU
+
+                if (records_sent_this_cycle >= MAX_SYNC_RECORDS_PER_CYCLE) {
+                    APP_LOGI(TAG, "Reached max limits per cycle (%d). Pausing sync to rest.", MAX_SYNC_RECORDS_PER_CYCLE);
+                    file_fully_processed = false;
+                    break; // Thoát vòng lặp đọc file, tiến hành cắt file để nghỉ ngơi
+                }
 
                 EventBits_t bits = xEventGroupGetBits(_normal_mode_event_group);
                 if (!(bits & MQTT_CONNECTED_BIT)) {
@@ -257,8 +266,10 @@ void task_backup_recovery(void *pvParameters)
 
                         if (xQueueSend(_mqtt_outgoing_queue, &msg, pdMS_TO_TICKS(500)) == pdPASS) {
                             processed_bytes = entry.position(); 
-                            vTaskDelay(pdMS_TO_TICKS(100)); 
+                            records_sent_this_cycle++;
+                            vTaskDelay(pdMS_TO_TICKS(500)); 
                             // LƯU Ý: KHÔNG ĐƯỢC FREE(MSG) Ở ĐÂY NỮA. Task MQTT sẽ lo việc đó!
+                            portYIELD();
                         } else {
                             APP_LOGW(TAG, "Queue congested, backing off.");
                             entry.seek(processed_bytes); 
@@ -290,7 +301,9 @@ void task_backup_recovery(void *pvParameters)
                 sd_truncate_file(filename.c_str(), processed_bytes); // Gọi trực tiếp từ Driver SD Card
             }
 
-            if (connection_lost) break; // Thoát vòng lặp Folder để chờ mạng
+            if (connection_lost || records_sent_this_cycle >= MAX_SYNC_RECORDS_PER_CYCLE) {
+                break; 
+            } // Thoát vòng lặp Folder để chờ mạng
         }
         
         dir.close();

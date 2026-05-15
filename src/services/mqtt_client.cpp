@@ -175,6 +175,7 @@ void mqtt_reset_to_default_config(void)
     strcpy(_mqtt_topic_pub, MQTT_TOPIC_PUB);
     strcpy(_mqtt_token, MQTT_TOKEN);
     strcpy(_mqtt_auth_method, MQTT_AUTH_METHOD);    
+    _mqtt_port = MQTT_PORT;
 }
 
 void mqtt_handle_remote_config(const char* payload) {
@@ -227,6 +228,7 @@ void mqtt_handle_remote_config(const char* payload) {
         {            
             strlcpy(_mqtt_host, server_config["host"] | "", sizeof(_mqtt_host));
             strlcpy(_mqtt_topic_pub, server_config["topic"] | "", sizeof(_mqtt_topic_pub));
+            _mqtt_port = server_config["port"] | MQTT_PORT;
 
             if (server_config["auth"]) 
             {

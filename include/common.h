@@ -39,14 +39,14 @@
 // information
 #define PRODUCT_NAME                "Inverter Datalogger"
 #define PRODUCT_MODEL               "DATALOGER260303L REV. 003"
-#define FIRMWARE_VERSION            "1.2.2"
-#define BUILD_NUMBER                "20260727.012"
+#define FIRMWARE_VERSION            "1.2.8"
+#define BUILD_NUMBER                "20261205.03"
 
 // device setting
 #define STATION_CODE                "ID"
 #define DEVICE_NAME                 "Inverter Datalogger"
-#define ID_DEFAULT                  "0001"
-#define VERSION_DEFAULT             1
+#define ID_DEFAULT                  "0002"
+#define VERSION_DEFAULT             2
 
 // wifi setting
 #define WIFI_SSID_DEFAULT           "----"
@@ -56,17 +56,17 @@
 #define NTP_SERVER                  "pool.ntp.org"
 
 // mqtt setting in server network
-#define MQTT_HOST                   "115.73.209.204"
+#define MQTT_HOST                   "20.17.162.135"
 #define MQTT_USERNAME               "SolarInverterDatalogger"
 #define MQTT_PASSWORD               "12345678"
-#define MQTT_TOPIC_SUB              "inverter/001/config"
-#define MQTT_TOPIC_PUB              "inverter/001/data"
+#define MQTT_TOPIC_SUB              "inverter/002/config"
+#define MQTT_TOPIC_PUB              "inverter/002/data"
 #define MQTT_TOKEN                  ""
 #define MQTT_AUTH_METHOD            "User/Pass"
-#define MQTT_PORT                   1884
+#define MQTT_PORT                   1883
 
 // ap setting
-#define AP_SSID_DEFAULT             "Inverter_Datalogger_0001"
+#define AP_SSID_DEFAULT             "Inverter_Datalogger_0002"
 #define AP_PASSWORD_DEFAULT         "12345678"
 #define AP_ADMIN_USERNAME           "admin"
 #define AP_ADMIN_PASSWORD           "adminisme"
